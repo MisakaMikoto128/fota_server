@@ -1,0 +1,209 @@
+{% extends "layout.html" %}
+
+{% block title %}固件管理 - FOTA 固件升级服务器{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-file-earmark-binary me-2"></i>固件管理</h1>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadFirmwareModal">
+        <i class="bi bi-upload me-2"></i>上传新固件
+    </button>
+</div>
+
+{% if firmwares %}
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>版本号</th>
+                        <th>文件名</th>
+                        <th>大小</th>
+                        <th>上传时间</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for firmware in firmwares %}
+                    <tr>
+                        <td>{{ firmware.version }}</td>
+                        <td>{{ firmware.filename }}</td>
+                        <td>{{ (firmware.filesize / 1024)|round(1) }} KB</td>
+                        <td>{{ firmware.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>
+                            {% if firmware.is_active %}
+                            <span class="badge bg-success">启用</span>
+                            {% else %}
+                            <span class="badge bg-secondary">禁用</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{{ url_for('download_firmware_admin', firmware_id=firmware.id) }}" class="btn btn-outline-primary">
+                                    <i class="bi bi-download"></i>
+                                </a>
+                                <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" 
+                                        data-bs-target="#firmwareDetailModal" 
+                                        data-firmware-id="{{ firmware.id }}"
+                                        data-firmware-version="{{ firmware.version }}"
+                                        data-firmware-filename="{{ firmware.filename }}"
+                                        data-firmware-description="{{ firmware.description }}">
+                                    <i class="bi bi-info-circle"></i>
+                                </button>
+                                {% if firmware.is_active %}
+                                <a href="{{ url_for('toggle_firmware', firmware_id=firmware.id) }}" class="btn btn-outline-warning">
+                                    <i class="bi bi-pause-fill"></i>
+                                </a>
+                                {% else %}
+                                <a href="{{ url_for('toggle_firmware', firmware_id=firmware.id) }}" class="btn btn-outline-success">
+                                    <i class="bi bi-play-fill"></i>
+                                </a>
+                                {% endif %}
+                                <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" 
+                                        data-bs-target="#deleteFirmwareModal" 
+                                        data-firmware-id="{{ firmware.id }}"
+                                        data-firmware-version="{{ firmware.version }}">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="card">
+    <div class="card-body text-center py-5">
+        <i class="bi bi-file-earmark-x text-muted" style="font-size: 4rem;"></i>
+        <h4 class="mt-3 text-muted">暂无固件</h4>
+        <p class="text-muted">点击上方的"上传新固件"按钮添加固件</p>
+    </div>
+</div>
+{% endif %}
+
+<!-- 上传固件模态框 -->
+<div class="modal fade" id="uploadFirmwareModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="bi bi-upload me-2"></i>上传新固件</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('firmware_upload') }}" enctype="multipart/form-data">
+                {{ upload_form.hidden_tag() }}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="version" class="form-label">版本号 <span class="text-danger">*</span></label>
+                        {{ upload_form.version(class="form-control", placeholder="例如: 001.000.001") }}
+                        <div class="form-text">请使用格式: xxx.yyy.zzz</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="firmware_file" class="form-label">固件文件 <span class="text-danger">*</span></label>
+                        {{ upload_form.firmware_file(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">版本描述</label>
+                        {{ upload_form.description(class="form-control", rows=3, placeholder="请输入此版本的更新内容...") }}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-upload me-2"></i>上传
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 固件详情模态框 -->
+<div class="modal fade" id="firmwareDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title"><i class="bi bi-info-circle me-2"></i>固件详情</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <h6>版本号</h6>
+                    <p id="detailVersion" class="fw-bold"></p>
+                </div>
+                <div class="mb-3">
+                    <h6>文件名</h6>
+                    <p id="detailFilename"></p>
+                </div>
+                <div class="mb-3">
+                    <h6>版本描述</h6>
+                    <p id="detailDescription" class="text-muted"></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 删除固件确认模态框 -->
+<div class="modal fade" id="deleteFirmwareModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="bi bi-exclamation-triangle me-2"></i>删除确认</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>您确定要删除版本 <span id="deleteVersion" class="fw-bold"></span> 的固件吗？</p>
+                <p class="text-danger">此操作不可逆，删除后将无法恢复。</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <a href="#" id="confirmDelete" class="btn btn-danger">
+                    <i class="bi bi-trash me-2"></i>确认删除
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 固件详情模态框
+    const firmwareDetailModal = document.getElementById('firmwareDetailModal');
+    if (firmwareDetailModal) {
+        firmwareDetailModal.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            const version = button.getAttribute('data-firmware-version');
+            const filename = button.getAttribute('data-firmware-filename');
+            const description = button.getAttribute('data-firmware-description') || '无描述';
+            
+            document.getElementById('detailVersion').textContent = version;
+            document.getElementById('detailFilename').textContent = filename;
+            document.getElementById('detailDescription').textContent = description;
+        });
+    }
+    
+    // 删除确认模态框
+    const deleteFirmwareModal = document.getElementById('deleteFirmwareModal');
+    if (deleteFirmwareModal) {
+        deleteFirmwareModal.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            const firmwareId = button.getAttribute('data-firmware-id');
+            const version = button.getAttribute('data-firmware-version');
+            
+            document.getElementById('deleteVersion').textContent = version;
+            document.getElementById('confirmDelete').href = "{{ url_for('delete_firmware', firmware_id=0) }}".replace('0', firmwareId);
+        });
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,212 @@
+{% extends "layout.html" %}
+
+{% block title %}仪表盘 - FOTA 固件升级服务器{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stat-card {
+        transition: transform 0.3s;
+    }
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+    .stat-icon {
+        font-size: 2.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1 class="mb-4"><i class="bi bi-speedometer2 me-2"></i>仪表盘</h1>
+
+<div class="row">
+    <div class="col-md-3 mb-4">
+        <div class="card stat-card bg-primary text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title">设备总数</h6>
+                        <h2 class="mb-0">{{ stats.device_count }}</h2>
+                    </div>
+                    <i class="bi bi-phone stat-icon"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card stat-card bg-success text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title">固件版本数</h6>
+                        <h2 class="mb-0">{{ stats.firmware_count }}</h2>
+                    </div>
+                    <i class="bi bi-file-earmark-binary stat-icon"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card stat-card bg-info text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title">今日更新</h6>
+                        <h2 class="mb-0">{{ stats.today_updates }}</h2>
+                    </div>
+                    <i class="bi bi-arrow-up-circle stat-icon"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card stat-card bg-warning text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title">待更新设备</h6>
+                        <h2 class="mb-0">{{ stats.pending_updates }}</h2>
+                    </div>
+                    <i class="bi bi-exclamation-circle stat-icon"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-2">
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>最近更新</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_updates %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>设备</th>
+                                <th>版本</th>
+                                <th>时间</th>
+                                <th>状态</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for update in recent_updates %}
+                            <tr>
+                                <td>{{ update.device.imei }}</td>
+                                <td>{{ update.from_version }} → {{ update.to_version }}</td>
+                                <td>{{ update.update_time.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td>
+                                    {% if update.status == 'success' %}
+                                    <span class="badge bg-success">成功</span>
+                                    {% elif update.status == 'failed' %}
+                                    <span class="badge bg-danger">失败</span>
+                                    {% else %}
+                                    <span class="badge bg-warning">进行中</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+                    <p class="mt-3 text-muted">暂无更新记录</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-phone me-2"></i>设备版本分布</h5>
+            </div>
+            <div class="card-body">
+                {% if version_distribution %}
+                <canvas id="versionChart" width="400" height="300"></canvas>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="bi bi-bar-chart text-muted" style="font-size: 3rem;"></i>
+                    <p class="mt-3 text-muted">暂无设备数据</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-activity me-2"></i>系统活动</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>时间</th>
+                                <th>类型</th>
+                                <th>详情</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for activity in system_activities %}
+                            <tr>
+                                <td>{{ activity.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                <td>{{ activity.type }}</td>
+                                <td>{{ activity.details }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+{% if version_distribution %}
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('versionChart').getContext('2d');
+    const versionChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: [{% for version, count in version_distribution.items() %}'{{ version }}',{% endfor %}],
+            datasets: [{
+                data: [{% for version, count in version_distribution.items() %}{{ count }},{% endfor %}],
+                backgroundColor: [
+                    'rgba(54, 162, 235, 0.8)',
+                    'rgba(255, 99, 132, 0.8)',
+                    'rgba(255, 206, 86, 0.8)',
+                    'rgba(75, 192, 192, 0.8)',
+                    'rgba(153, 102, 255, 0.8)',
+                    'rgba(255, 159, 64, 0.8)',
+                    'rgba(199, 199, 199, 0.8)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'right',
+                }
+            }
+        }
+    });
+});
+{% endif %}
+</script>
+{% endblock %}

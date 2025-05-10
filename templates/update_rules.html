@@ -1,0 +1,181 @@
+{% extends "layout.html" %}
+
+{% block title %}升级规则 - FOTA 固件升级服务器{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-diagram-3 me-2"></i>升级规则管理</h1>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addRuleModal">
+        <i class="bi bi-plus-circle me-2"></i>添加规则
+    </button>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>规则说明</h5>
+    </div>
+    <div class="card-body">
+        <p>升级规则定义了设备从一个版本升级到另一个版本的路径。当设备请求更新时，系统会根据设备当前版本查找匹配的规则，并提供相应的固件。</p>
+        <ul>
+            <li>每个规则包含起始版本、目标版本和对应的固件</li>
+            <li>只有启用状态的规则才会生效</li>
+            <li>如果存在多个匹配的规则，系统会选择第一个找到的规则</li>
+        </ul>
+    </div>
+</div>
+
+{% if rules %}
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>起始版本</th>
+                        <th>目标版本</th>
+                        <th>固件</th>
+                        <th>创建时间</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for rule in rules %}
+                    <tr>
+                        <td>{{ rule.from_version }}</td>
+                        <td>{{ rule.to_version }}</td>
+                        <td>{{ rule.firmware.version }} ({{ rule.firmware.filename }})</td>
+                        <td>{{ rule.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>
+                            {% if rule.is_active %}
+                            <span class="badge bg-success">启用</span>
+                            {% else %}
+                            <span class="badge bg-secondary">禁用</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                {% if rule.is_active %}
+                                <a href="{{ url_for('toggle_rule', rule_id=rule.id) }}" class="btn btn-outline-warning">
+                                    <i class="bi bi-pause-fill"></i>
+                                </a>
+                                {% else %}
+                                <a href="{{ url_for('toggle_rule', rule_id=rule.id) }}" class="btn btn-outline-success">
+                                    <i class="bi bi-play-fill"></i>
+                                </a>
+                                {% endif %}
+                                <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" 
+                                        data-bs-target="#deleteRuleModal" 
+                                        data-rule-id="{{ rule.id }}"
+                                        data-from-version="{{ rule.from_version }}"
+                                        data-to-version="{{ rule.to_version }}">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="card">
+    <div class="card-body text-center py-5">
+        <i class="bi bi-diagram-3 text-muted" style="font-size: 4rem;"></i>
+        <h4 class="mt-3 text-muted">暂无升级规则</h4>
+        <p class="text-muted">点击上方的"添加规则"按钮添加升级规则</p>
+    </div>
+</div>
+{% endif %}
+
+<!-- 添加规则模态框 -->
+<div class="modal fade" id="addRuleModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>添加升级规则</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('add_rule') }}">
+                {{ form.hidden_tag() }}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="from_version" class="form-label">起始版本 <span class="text-danger">*</span></label>
+                        {{ form.from_version(class="form-control", placeholder="例如: 001.000.000") }}
+                        <div class="form-text">设备当前的版本</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="to_version" class="form-label">目标版本 <span class="text-danger">*</span></label>
+                        {{ form.to_version(class="form-control", placeholder="例如: 001.000.001") }}
+                        <div class="form-text">设备将升级到的版本</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="firmware_id" class="form-label">固件 <span class="text-danger">*</span></label>
+                        <select name="firmware_id" class="form-select" required>
+                            <option value="">-- 请选择固件 --</option>
+                            {% for firmware in firmwares %}
+                            <option value="{{ firmware.id }}">{{ firmware.version }} ({{ firmware.filename }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3 form-check">
+                        {{ form.is_active(class="form-check-input") }}
+                        <label class="form-check-label" for="is_active">启用规则</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-plus-circle me-2"></i>添加
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 删除规则确认模态框 -->
+<div class="modal fade" id="deleteRuleModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="bi bi-exclamation-triangle me-2"></i>删除确认</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>您确定要删除从 <span id="deleteFromVersion" class="fw-bold"></span> 到 <span id="deleteToVersion" class="fw-bold"></span> 的升级规则吗？</p>
+                <p class="text-danger">此操作不可逆，删除后将无法恢复。</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <a href="#" id="confirmDeleteRule" class="btn btn-danger">
+                    <i class="bi bi-trash me-2"></i>确认删除
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 删除规则确认模态框
+    const deleteRuleModal = document.getElementById('deleteRuleModal');
+    if (deleteRuleModal) {
+        deleteRuleModal.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            const ruleId = button.getAttribute('data-rule-id');
+            const fromVersion = button.getAttribute('data-from-version');
+            const toVersion = button.getAttribute('data-to-version');
+            
+            document.getElementById('deleteFromVersion').textContent = fromVersion;
+            document.getElementById('deleteToVersion').textContent = toVersion;
+            document.getElementById('confirmDeleteRule').href = "{{ url_for('delete_rule', rule_id=0) }}".replace('0', ruleId);
+        });
+    }
+});
+</script>
+{% endblock %}

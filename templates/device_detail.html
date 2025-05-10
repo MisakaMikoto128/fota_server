@@ -1,0 +1,185 @@
+{% extends "layout.html" %}
+
+{% block title %}设备详情 - FOTA 固件升级服务器{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-phone me-2"></i>设备详情</h1>
+    <a href="{{ url_for('device_list') }}" class="btn btn-outline-primary">
+        <i class="bi bi-arrow-left me-2"></i>返回设备列表
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>基本信息</h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <i class="bi bi-phone" style="font-size: 5rem; color: #0d6efd;"></i>
+                    <h3 class="mt-3">{{ device.name or '未命名设备' }}</h3>
+                    <span class="badge {% if device.is_authorized %}bg-success{% else %}bg-danger{% endif %}">
+                        {% if device.is_authorized %}已授权{% else %}未授权{% endif %}
+                    </span>
+                </div>
+                
+                <table class="table table-borderless">
+                    <tr>
+                        <th>IMEI:</th>
+                        <td>{{ device.imei }}</td>
+                    </tr>
+                    <tr>
+                        <th>当前版本:</th>
+                        <td>{{ device.current_version or '未知' }}</td>
+                    </tr>
+                    <tr>
+                        <th>最后检查时间:</th>
+                        <td>{{ device.last_check_time.strftime('%Y-%m-%d %H:%M:%S') if device.last_check_time else '从未' }}</td>
+                    </tr>
+                    <tr>
+                        <th>最后更新时间:</th>
+                        <td>{{ device.last_update_time.strftime('%Y-%m-%d %H:%M:%S') if device.last_update_time else '从未' }}</td>
+                    </tr>
+                    <tr>
+                        <th>创建时间:</th>
+                        <td>{{ device.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    </tr>
+                </table>
+                
+                <div class="d-grid gap-2 mt-3">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editDeviceModal">
+                        <i class="bi bi-pencil me-2"></i>编辑设备
+                    </button>
+                    <a href="{{ url_for('toggle_device_auth', device_id=device.id) }}" class="btn {% if device.is_authorized %}btn-warning{% else %}btn-success{% endif %}">
+                        <i class="bi {% if device.is_authorized %}bi-slash-circle{% else %}bi-check-circle{% endif %} me-2"></i>
+                        {% if device.is_authorized %}禁用设备{% else %}授权设备{% endif %}
+                    </a>
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteDeviceModal">
+                        <i class="bi bi-trash me-2"></i>删除设备
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>更新历史</h5>
+            </div>
+            <div class="card-body">
+                {% if update_logs %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>从版本</th>
+                                <th>到版本</th>
+                                <th>更新时间</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in update_logs %}
+                            <tr>
+                                <td>{{ log.from_version }}</td>
+                                <td>{{ log.to_version }}</td>
+                                <td>{{ log.update_time.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                <td>
+                                    {% if log.status == 'success' %}
+                                    <span class="badge bg-success">成功</span>
+                                    {% elif log.status == 'failed' %}
+                                    <span class="badge bg-danger">失败</span>
+                                    {% else %}
+                                    <span class="badge bg-warning">进行中</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if log.status == 'pending' %}
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{{ url_for('update_log_status', log_id=log.id, status='success') }}" class="btn btn-outline-success">
+                                            <i class="bi bi-check-circle"></i>
+                                        </a>
+                                        <a href="{{ url_for('update_log_status', log_id=log.id, status='failed') }}" class="btn btn-outline-danger">
+                                            <i class="bi bi-x-circle"></i>
+                                        </a>
+                                    </div>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-clock-history text-muted" style="font-size: 4rem;"></i>
+                    <h4 class="mt-3 text-muted">暂无更新历史</h4>
+                    <p class="text-muted">当设备进行更新时，系统会自动记录更新历史</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 编辑设备模态框 -->
+<div class="modal fade" id="editDeviceModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="bi bi-pencil me-2"></i>编辑设备</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('edit_device', device_id=device.id) }}">
+                {{ form.hidden_tag() }}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="imei" class="form-label">IMEI</label>
+                        <input type="text" class="form-control" value="{{ device.imei }}" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="name" class="form-label">设备名称</label>
+                        {{ form.name(class="form-control", value=device.name) }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="current_version" class="form-label">当前版本</label>
+                        {{ form.current_version(class="form-control", value=device.current_version) }}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save me-2"></i>保存
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 删除设备确认模态框 -->
+<div class="modal fade" id="deleteDeviceModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="bi bi-exclamation-triangle me-2"></i>删除确认</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>您确定要删除IMEI为 <span class="fw-bold">{{ device.imei }}</span> 的设备吗？</p>
+                <p class="text-danger">此操作不可逆，删除后将无法恢复。所有与此设备相关的更新记录也将被删除。</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <a href="{{ url_for('delete_device', device_id=device.id) }}" class="btn btn-danger">
+                    <i class="bi bi-trash me-2"></i>确认删除
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

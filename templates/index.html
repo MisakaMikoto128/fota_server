@@ -1,0 +1,92 @@
+{% extends "layout.html" %}
+
+{% block title %}首页 - FOTA 固件升级服务器{% endblock %}
+
+{% block content %}
+<div class="jumbotron bg-light p-5 rounded">
+    <h1 class="display-4">FOTA 固件升级服务器</h1>
+    <p class="lead">为您的物联网设备提供安全、可靠的固件空中升级服务。</p>
+    <hr class="my-4">
+    <p>本系统支持 AIR780E 等设备的固件升级管理，提供版本控制、设备管理和升级日志记录等功能。</p>
+    {% if not current_user.is_authenticated %}
+    <a class="btn btn-primary btn-lg" href="{{ url_for('login') }}">
+        <i class="bi bi-box-arrow-in-right me-2"></i>管理员登录
+    </a>
+    {% else %}
+    <a class="btn btn-primary btn-lg" href="{{ url_for('dashboard') }}">
+        <i class="bi bi-speedometer2 me-2"></i>进入仪表盘
+    </a>
+    {% endif %}
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-cloud-arrow-down text-primary" style="font-size: 3rem;"></i>
+                <h5 class="card-title mt-3">空中升级</h5>
+                <p class="card-text">通过网络远程更新设备固件，无需物理接触设备，大幅降低维护成本。</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-shield-check text-primary" style="font-size: 3rem;"></i>
+                <h5 class="card-title mt-3">安全可靠</h5>
+                <p class="card-text">提供设备认证和固件验证机制，确保升级过程的安全性和可靠性。</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-graph-up text-primary" style="font-size: 3rem;"></i>
+                <h5 class="card-title mt-3">数据统计</h5>
+                <p class="card-text">提供详细的设备升级统计和日志记录，帮助您了解设备升级状态。</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>系统信息</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        服务器版本
+                        <span class="badge bg-primary rounded-pill">1.0.0</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        API 版本
+                        <span class="badge bg-primary rounded-pill">1.0</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        支持设备
+                        <span class="badge bg-primary rounded-pill">AIR780E</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-question-circle me-2"></i>快速入门</h5>
+            </div>
+            <div class="card-body">
+                <ol class="list-group list-group-numbered">
+                    <li class="list-group-item">登录管理员账户</li>
+                    <li class="list-group-item">上传新版本固件</li>
+                    <li class="list-group-item">配置升级规则</li>
+                    <li class="list-group-item">设备将自动检查并下载更新</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,93 @@
+{% extends "layout.html" %}
+
+{% block title %}个人资料 - FOTA 固件升级服务器{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="bi bi-person-circle me-2"></i>个人资料</h4>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-3 text-center">
+                        <div class="avatar-container mb-3">
+                            <i class="bi bi-person-circle" style="font-size: 6rem; color: #0d6efd;"></i>
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <h3>{{ current_user.username }}</h3>
+                        <p class="text-muted">
+                            {% if current_user.is_admin %}
+                            <span class="badge bg-danger">管理员</span>
+                            {% else %}
+                            <span class="badge bg-secondary">普通用户</span>
+                            {% endif %}
+                        </p>
+                        <p><strong>账户创建时间:</strong> {{ current_user.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                        <p><strong>最后登录时间:</strong> {{ current_user.last_login.strftime('%Y-%m-%d %H:%M:%S') if current_user.last_login else '从未登录' }}</p>
+                    </div>
+                </div>
+
+                <hr>
+
+                <h5 class="mb-3"><i class="bi bi-shield-lock me-2"></i>修改密码</h5>
+                <form method="POST" action="{{ url_for('change_password') }}">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label for="current_password" class="form-label">当前密码</label>
+                            <input type="password" class="form-control" id="current_password" name="current_password" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="new_password" class="form-label">新密码</label>
+                            <input type="password" class="form-control" id="new_password" name="new_password" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="confirm_password" class="form-label">确认新密码</label>
+                            <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                        </div>
+                        <div class="col-12 text-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle me-2"></i>更新密码
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card shadow mt-4">
+            <div class="card-header bg-info text-white">
+                <h4 class="mb-0"><i class="bi bi-activity me-2"></i>最近活动</h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>时间</th>
+                                <th>活动</th>
+                                <th>IP地址</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- 这里可以添加用户活动记录 -->
+                            <tr>
+                                <td>{{ now.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                <td>查看个人资料</td>
+                                <td>{{ request.remote_addr }}</td>
+                            </tr>
+                            <tr>
+                                <td>{{ (now - timedelta(minutes=30)).strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                <td>登录系统</td>
+                                <td>{{ request.remote_addr }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
