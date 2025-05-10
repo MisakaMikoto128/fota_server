@@ -718,7 +718,7 @@ def export_logs():
 @login_required
 def profile():
     """个人资料页面"""
-    return render_template('profile.html')
+    return render_template('profile.html', timedelta=timedelta)
 
 @app.route('/change_password', methods=['POST'])
 @login_required
