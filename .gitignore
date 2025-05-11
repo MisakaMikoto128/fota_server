@@ -114,3 +114,7 @@ venv.bak/
 # Project specific
 update_packages/*
 !update_packages/.gitkeep
+
+# Avatar files
+static/avatars/*
+!static/avatars/default.jpg

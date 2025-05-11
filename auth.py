@@ -7,6 +7,7 @@ from datetime import datetime
 
 from models import db, User, Role
 from forms import LoginForm, RegistrationForm, UserProfileForm
+from avatar_generator import generate_random_avatar
 
 # 创建蓝图
 auth_bp = Blueprint('auth', __name__)
@@ -67,6 +68,18 @@ def register():
         if not Role.query.first():
             Role.insert_roles()
 
+        # 如果用户选择使用AI生成动漫头像
+        if form.use_ai_avatar.data:
+            # 确保头像目录存在
+            avatar_dir = os.path.join(os.path.dirname(__file__), 'static/avatars')
+            if not os.path.exists(avatar_dir):
+                os.makedirs(avatar_dir)
+
+            # 生成动漫头像
+            avatar_filename = generate_random_avatar(form.username.data, avatar_dir)
+            user.avatar = avatar_filename
+            flash(_('已为您生成动漫风格头像'), 'info')
+
         db.session.add(user)
         db.session.commit()
 
@@ -100,21 +113,27 @@ def profile():
         if form.new_password.data:
             current_user.set_password(form.new_password.data)
 
+        # 确保头像目录存在
+        avatar_dir = os.path.join(os.path.dirname(__file__), 'static/avatars')
+        if not os.path.exists(avatar_dir):
+            os.makedirs(avatar_dir)
+
         # 处理头像上传
         if form.avatar.data:
             avatar_file = form.avatar.data
             filename = secure_filename(f"{current_user.username}_{datetime.now().strftime('%Y%m%d%H%M%S')}.{avatar_file.filename.rsplit('.', 1)[1].lower()}")
-
-            # 确保头像目录存在
-            avatar_dir = os.path.join(os.path.dirname(__file__), 'static/avatars')
-            if not os.path.exists(avatar_dir):
-                os.makedirs(avatar_dir)
-
             avatar_path = os.path.join(avatar_dir, filename)
             avatar_file.save(avatar_path)
-
             # 更新用户头像
             current_user.avatar = filename
+            flash(_('头像已更新'), 'success')
+        # 生成新的动漫头像
+        elif form.generate_anime_avatar.data:
+            # 生成动漫头像
+            avatar_filename = generate_random_avatar(current_user.username, avatar_dir)
+            # 更新用户头像
+            current_user.avatar = avatar_filename
+            flash(_('已为您生成新的动漫风格头像'), 'success')
 
         db.session.commit()
         flash(_('个人资料已更新'), 'success')

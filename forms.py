@@ -33,6 +33,7 @@ class RegistrationForm(FlaskForm):
         EqualTo('password', message=_l('两次输入的密码不匹配'))
     ])
     name = StringField(_l('姓名'), validators=[Optional(), Length(max=64)])
+    use_ai_avatar = BooleanField(_l('使用AI生成动漫头像'), default=True)
     submit = SubmitField(_l('注册'))
 
     def validate_username(self, field):
@@ -57,6 +58,7 @@ class UserProfileForm(FlaskForm):
         Optional(),
         FileAllowed(['jpg', 'png', 'jpeg'], _l('只允许上传jpg、png或jpeg格式的图片'))
     ])
+    generate_anime_avatar = BooleanField(_l('生成新的动漫头像'), default=False)
     current_password = PasswordField(_l('当前密码'))
     new_password = PasswordField(_l('新密码'), validators=[
         Optional(),
