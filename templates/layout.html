@@ -67,6 +67,11 @@
                     </li>
                     {% endif %}
                     {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('pages.about') }}">
+                            <i class="bi bi-info-circle me-1"></i>{{ _('关于') }}
+                        </a>
+                    </li>
                 </ul>
                 <ul class="navbar-nav">
                     <!-- 语言切换 -->
@@ -142,7 +147,7 @@
     <!-- 页脚 -->
     <footer class="footer mt-auto py-3 bg-light">
         <div class="container text-center">
-            <span class="text-muted">© {{ now.year }} FOTA 固件升级服务器 | {{ _('版本') }}: 2.0.0</span>
+            <span class="text-muted">© {{ now.year }} FOTA 固件升级服务器 | {{ _('版本') }}: 2.0.0 | <a href="{{ url_for('pages.about') }}" class="text-decoration-none text-muted">{{ _('关于') }}</a></span>
         </div>
     </footer>
 

@@ -726,6 +726,37 @@ msgstr "Configure upgrade rules"
 msgid "添加设备或等待设备自动注册"
 msgstr "Add devices or wait for devices to register automatically"
 
+# 关于页面
+msgid "关于"
+msgstr "About"
+
+msgid "关于我们"
+msgstr "About Us"
+
+msgid "林愿留"
+msgstr "Lin Yuanliu"
+
+msgid "FOTA 固件升级服务器开发者"
+msgstr "FOTA Firmware Upgrade Server Developer"
+
+msgid "博客"
+msgstr "Blog"
+
+msgid "项目介绍"
+msgstr "Project Introduction"
+
+msgid "FOTA 固件升级服务器是一个专为物联网设备设计的固件空中升级平台，支持 AIR780E 等设备的远程固件更新。"
+msgstr "FOTA Firmware Upgrade Server is a firmware over-the-air upgrade platform specifically designed for IoT devices, supporting remote firmware updates for devices such as AIR780E."
+
+msgid "本系统提供了完整的固件版本管理、设备管理、升级规则配置和升级日志记录等功能，帮助开发者轻松实现设备的远程升级。"
+msgstr "This system provides complete firmware version management, device management, upgrade rule configuration, and upgrade log recording functions to help developers easily implement remote upgrades of devices."
+
+msgid "技术栈"
+msgstr "Tech Stack"
+
+msgid "固件升级服务器"
+msgstr "Firmware Upgrade Server"
+
 msgid "设备将自动检查并下载更新"
 msgstr "Devices will automatically check for and download updates"
 

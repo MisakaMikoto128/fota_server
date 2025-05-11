@@ -14,6 +14,12 @@ def index():
     return render_template('index.html')
 
 
+@pages_bp.route('/about')
+def about():
+    """关于页面"""
+    return render_template('about.html')
+
+
 @pages_bp.route('/dashboard')
 @login_required
 def dashboard():
