@@ -29,7 +29,7 @@ def login():
             # 更新最后登录时间
             user.last_login = datetime.utcnow()
             db.session.commit()
-            
+
             next_page = request.args.get('next')
             flash(_('登录成功！'), 'success')
             return redirect(next_page or url_for('main.dashboard'))
@@ -62,17 +62,17 @@ def register():
             name=form.name.data
         )
         user.set_password(form.password.data)
-        
+
         # 确保角色已初始化
         if not Role.query.first():
             Role.insert_roles()
-            
+
         db.session.add(user)
         db.session.commit()
-        
+
         flash(_('注册成功！现在您可以登录了'), 'success')
         return redirect(url_for('auth.login'))
-        
+
     return render_template('auth/register.html', form=form)
 
 
@@ -81,50 +81,60 @@ def register():
 def profile():
     """用户资料"""
     form = UserProfileForm()
-    
+
     if request.method == 'GET':
         form.name.data = current_user.name
         form.email.data = current_user.email
-    
+
     if form.validate_on_submit():
         # 验证当前密码
         if form.current_password.data and not current_user.check_password(form.current_password.data):
             flash(_('当前密码不正确'), 'danger')
             return render_template('auth/profile.html', form=form)
-        
+
         # 更新基本信息
         current_user.name = form.name.data
         current_user.email = form.email.data
-        
+
         # 更新密码（如果提供了新密码）
         if form.new_password.data:
             current_user.set_password(form.new_password.data)
-        
+
         # 处理头像上传
         if form.avatar.data:
             avatar_file = form.avatar.data
             filename = secure_filename(f"{current_user.username}_{datetime.now().strftime('%Y%m%d%H%M%S')}.{avatar_file.filename.rsplit('.', 1)[1].lower()}")
-            
+
             # 确保头像目录存在
             avatar_dir = os.path.join(os.path.dirname(__file__), 'static/avatars')
             if not os.path.exists(avatar_dir):
                 os.makedirs(avatar_dir)
-                
+
             avatar_path = os.path.join(avatar_dir, filename)
             avatar_file.save(avatar_path)
-            
+
             # 更新用户头像
             current_user.avatar = filename
-        
+
         db.session.commit()
         flash(_('个人资料已更新'), 'success')
         return redirect(url_for('auth.profile'))
-        
+
     return render_template('auth/profile.html', form=form)
 
 
 @auth_bp.route('/language/<lang>')
 def set_language(lang):
     """设置语言"""
-    session['language'] = lang
+    # 确保语言代码有效
+    from flask import current_app
+    if lang in current_app.config['LANGUAGES']:
+        session['language'] = lang
+        # 添加一个闪现消息，提示用户语言已更改
+        if lang == 'zh':
+            flash('语言已切换为中文', 'success')
+        elif lang == 'en':
+            flash('Language switched to English', 'success')
+        elif lang == 'ja':
+            flash('言語が日本語に切り替わりました', 'success')
     return redirect(request.referrer or url_for('main.index'))

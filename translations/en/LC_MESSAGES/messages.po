@@ -1,0 +1,854 @@
+# English translations for FOTA Server.
+# Copyright (C) 2023 FOTA Server Team
+# This file is distributed under the same license as the FOTA Server project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2023.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: FOTA Server 1.0\n"
+"Report-Msgid-Bugs-To: admin@example.com\n"
+"POT-Creation-Date: 2023-05-11 10:00+0800\n"
+"PO-Revision-Date: 2023-05-11 10:00+0800\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: English\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+# 通用
+msgid "保存"
+msgstr "Save"
+
+msgid "取消"
+msgstr "Cancel"
+
+msgid "确认"
+msgstr "Confirm"
+
+msgid "删除"
+msgstr "Delete"
+
+msgid "编辑"
+msgstr "Edit"
+
+msgid "添加"
+msgstr "Add"
+
+msgid "上传"
+msgstr "Upload"
+
+msgid "下载"
+msgstr "Download"
+
+msgid "导入"
+msgstr "Import"
+
+msgid "导出"
+msgstr "Export"
+
+msgid "搜索"
+msgstr "Search"
+
+msgid "重置"
+msgstr "Reset"
+
+msgid "登录"
+msgstr "Login"
+
+msgid "注册"
+msgstr "Register"
+
+msgid "退出"
+msgstr "Logout"
+
+# 用户相关
+msgid "用户名"
+msgstr "Username"
+
+msgid "密码"
+msgstr "Password"
+
+msgid "确认密码"
+msgstr "Confirm Password"
+
+msgid "电子邮箱"
+msgstr "Email"
+
+msgid "姓名"
+msgstr "Name"
+
+msgid "头像"
+msgstr "Avatar"
+
+msgid "记住我"
+msgstr "Remember Me"
+
+msgid "当前密码"
+msgstr "Current Password"
+
+msgid "新密码"
+msgstr "New Password"
+
+msgid "确认新密码"
+msgstr "Confirm New Password"
+
+msgid "保存修改"
+msgstr "Save Changes"
+
+msgid "该用户名已被使用"
+msgstr "This username is already taken"
+
+msgid "该邮箱已被注册"
+msgstr "This email is already registered"
+
+msgid "请输入有效的电子邮箱地址"
+msgstr "Please enter a valid email address"
+
+msgid "密码长度至少为6个字符"
+msgstr "Password must be at least 6 characters"
+
+msgid "两次输入的密码不匹配"
+msgstr "Passwords do not match"
+
+# 项目相关
+msgid "项目名称"
+msgstr "Project Name"
+
+msgid "项目描述"
+msgstr "Project Description"
+
+msgid "项目密钥"
+msgstr "Project Key"
+
+msgid "所属项目"
+msgstr "Project"
+
+msgid "添加用户到项目"
+msgstr "Add User to Project"
+
+# 固件相关
+msgid "版本号"
+msgstr "Version"
+
+msgid "固件文件"
+msgstr "Firmware File"
+
+msgid "版本描述"
+msgstr "Version Description"
+
+msgid "版本号格式必须为xxx.yyy.zzz"
+msgstr "Version format must be xxx.yyy.zzz"
+
+msgid "只允许上传.bin文件"
+msgstr "Only .bin files are allowed"
+
+# 设备相关
+msgid "IMEI"
+msgstr "IMEI"
+
+msgid "设备名称"
+msgstr "Device Name"
+
+msgid "当前版本"
+msgstr "Current Version"
+
+msgid "授权设备"
+msgstr "Authorize Device"
+
+msgid "IMEI必须为15位数字"
+msgstr "IMEI must be 15 digits"
+
+msgid "CSV文件"
+msgstr "CSV File"
+
+msgid "只允许上传.csv文件"
+msgstr "Only .csv files are allowed"
+
+msgid "跳过第一行"
+msgstr "Skip First Row"
+
+# 规则相关
+msgid "起始版本"
+msgstr "From Version"
+
+msgid "目标版本"
+msgstr "To Version"
+
+msgid "固件"
+msgstr "Firmware"
+
+msgid "启用规则"
+msgstr "Enable Rule"
+
+# 语言相关
+msgid "语言"
+msgstr "Language"
+
+msgid "中文"
+msgstr "Chinese"
+
+msgid "英文"
+msgstr "English"
+
+msgid "日文"
+msgstr "Japanese"
+
+msgid "切换"
+msgstr "Switch"
+
+# 错误提示
+msgid "请先登录以访问此页面"
+msgstr "Please login to access this page"
+
+msgid "无效的状态"
+msgstr "Invalid status"
+
+msgid "所有必填字段都必须填写"
+msgstr "All required fields must be filled"
+
+msgid "设备未授权"
+msgstr "Device not authorized"
+
+msgid "当前已是最新版本"
+msgstr "Already the latest version"
+
+msgid "发现新版本"
+msgstr "New version available"
+
+msgid "版本号格式错误"
+msgstr "Invalid version format"
+
+msgid "更新文件不存在"
+msgstr "Update file not found"
+
+# 导航和标题
+msgid "仪表盘"
+msgstr "Dashboard"
+
+msgid "项目"
+msgstr "Projects"
+
+msgid "设备"
+msgstr "Devices"
+
+msgid "固件"
+msgstr "Firmware"
+
+msgid "升级规则"
+msgstr "Update Rules"
+
+msgid "日志"
+msgstr "Logs"
+
+msgid "用户"
+msgstr "Users"
+
+msgid "个人资料"
+msgstr "Profile"
+
+msgid "首页"
+msgstr "Home"
+
+msgid "版本"
+msgstr "Version"
+
+# 仪表盘
+msgid "最后更新"
+msgstr "Last Updated"
+
+msgid "项目数"
+msgstr "Projects"
+
+msgid "设备数"
+msgstr "Devices"
+
+msgid "固件数"
+msgstr "Firmware"
+
+msgid "今日更新"
+msgstr "Today's Updates"
+
+msgid "待更新"
+msgstr "Pending Updates"
+
+msgid "版本分布"
+msgstr "Version Distribution"
+
+msgid "最近更新"
+msgstr "Recent Updates"
+
+msgid "暂无更新记录"
+msgstr "No update records"
+
+msgid "查看全部"
+msgstr "View All"
+
+msgid "项目活动"
+msgstr "Project Activities"
+
+msgid "项目名称"
+msgstr "Project Name"
+
+msgid "设备数"
+msgstr "Devices"
+
+msgid "规则数"
+msgstr "Rules"
+
+msgid "最近更新"
+msgstr "Recent Update"
+
+msgid "从未"
+msgstr "Never"
+
+msgid "操作"
+msgstr "Actions"
+
+msgid "暂无项目"
+msgstr "No projects"
+
+msgid "创建项目"
+msgstr "Create Project"
+
+# 项目管理
+msgid "项目管理"
+msgstr "Project Management"
+
+msgid "创建新项目"
+msgstr "Create New Project"
+
+msgid "查看详情"
+msgstr "View Details"
+
+msgid "创建于"
+msgstr "Created on"
+
+msgid "管理"
+msgstr "Manage"
+
+msgid "暂无描述"
+msgstr "No description"
+
+msgid "项目密钥已复制到剪贴板"
+msgstr "Project key copied to clipboard"
+
+msgid "项目密钥用于设备识别，自动生成，可点击刷新按钮重新生成"
+msgstr "Project key is used for device identification, auto-generated, click refresh to regenerate"
+
+msgid "警告：修改项目密钥将导致使用旧密钥的设备无法连接"
+msgstr "Warning: Changing the project key will prevent devices using the old key from connecting"
+
+msgid "您确定要删除项目"
+msgstr "Are you sure you want to delete the project"
+
+msgid "吗？"
+msgstr "?"
+
+msgid "此操作不可逆，删除后将无法恢复。所有关联的设备、固件和升级规则也将被删除。"
+msgstr "This operation is irreversible. All associated devices, firmware and update rules will also be deleted."
+
+msgid "确认删除"
+msgstr "Confirm Delete"
+
+# 项目详情
+msgid "项目详情"
+msgstr "Project Details"
+
+msgid "编辑项目"
+msgstr "Edit Project"
+
+msgid "删除项目"
+msgstr "Delete Project"
+
+msgid "项目信息"
+msgstr "Project Information"
+
+msgid "描述"
+msgstr "Description"
+
+msgid "创建者"
+msgstr "Creator"
+
+msgid "创建时间"
+msgstr "Creation Time"
+
+msgid "未知"
+msgstr "Unknown"
+
+msgid "项目成员"
+msgstr "Project Members"
+
+msgid "添加成员"
+msgstr "Add Member"
+
+msgid "邮箱"
+msgstr "Email"
+
+msgid "角色"
+msgstr "Role"
+
+msgid "确定要从项目中移除此用户吗？"
+msgstr "Are you sure you want to remove this user from the project?"
+
+msgid "暂无项目成员"
+msgstr "No project members"
+
+msgid "快速链接"
+msgstr "Quick Links"
+
+msgid "管理设备"
+msgstr "Manage Devices"
+
+msgid "个设备"
+msgstr "devices"
+
+msgid "管理固件"
+msgstr "Manage Firmware"
+
+msgid "个固件"
+msgstr "firmware"
+
+msgid "管理升级规则"
+msgstr "Manage Update Rules"
+
+msgid "个规则"
+msgstr "rules"
+
+msgid "添加项目成员"
+msgstr "Add Project Member"
+
+msgid "选择用户"
+msgstr "Select User"
+
+msgid "用户已添加到项目"
+msgstr "User added to project"
+
+msgid "用户已在项目中"
+msgstr "User already in project"
+
+msgid "不能移除项目创建者"
+msgstr "Cannot remove project creator"
+
+msgid "用户已从项目中移除"
+msgstr "User removed from project"
+
+# 设备管理
+msgid "设备管理"
+msgstr "Device Management"
+
+msgid "批量导入"
+msgstr "Batch Import"
+
+msgid "添加设备"
+msgstr "Add Device"
+
+msgid "全部"
+msgstr "All"
+
+msgid "已授权"
+msgstr "Authorized"
+
+msgid "未授权"
+msgstr "Unauthorized"
+
+msgid "全部项目"
+msgstr "All Projects"
+
+msgid "名称"
+msgstr "Name"
+
+msgid "最后检查时间"
+msgstr "Last Check Time"
+
+msgid "最后更新时间"
+msgstr "Last Update Time"
+
+msgid "状态"
+msgstr "Status"
+
+msgid "启动升级"
+msgstr "Start Upgrade"
+
+msgid "暂无设备"
+msgstr "No devices"
+
+msgid "点击上方的"添加设备"按钮添加您的第一个设备，或者使用"批量导入"功能"
+msgstr "Click the \"Add Device\" button above to add your first device, or use the \"Batch Import\" function"
+
+msgid "可选"
+msgstr "Optional"
+
+msgid "版本号格式为xxx.yyy.zzz"
+msgstr "Version format is xxx.yyy.zzz"
+
+msgid "只有授权的设备才能获取更新"
+msgstr "Only authorized devices can get updates"
+
+msgid "批量导入设备"
+msgstr "Batch Import Devices"
+
+msgid "CSV文件格式：IMEI,设备名称,当前版本,是否授权"
+msgstr "CSV file format: IMEI,Device Name,Current Version,Is Authorized"
+
+msgid "如果CSV文件包含标题行，请勾选此项"
+msgstr "If the CSV file contains a header row, please check this option"
+
+msgid "您确定要删除IMEI为"
+msgstr "Are you sure you want to delete the device with IMEI"
+
+msgid "的设备吗？"
+msgstr "?"
+
+msgid "此操作不可逆，删除后将无法恢复。所有关联的更新日志也将被删除。"
+msgstr "This operation is irreversible. All associated update logs will also be deleted."
+
+# 设备详情
+msgid "设备详情"
+msgstr "Device Details"
+
+msgid "编辑设备"
+msgstr "Edit Device"
+
+msgid "删除设备"
+msgstr "Delete Device"
+
+msgid "设备信息"
+msgstr "Device Information"
+
+msgid "授权状态"
+msgstr "Authorization Status"
+
+msgid "禁用"
+msgstr "Disable"
+
+msgid "授权"
+msgstr "Authorize"
+
+msgid "更新日志"
+msgstr "Update Logs"
+
+msgid "时间"
+msgstr "Time"
+
+msgid "从版本"
+msgstr "From Version"
+
+msgid "到版本"
+msgstr "To Version"
+
+msgid "成功"
+msgstr "Success"
+
+msgid "失败"
+msgstr "Failed"
+
+msgid "进行中"
+msgstr "In Progress"
+
+msgid "标记为成功"
+msgstr "Mark as Success"
+
+msgid "标记为失败"
+msgstr "Mark as Failed"
+
+msgid "标记为进行中"
+msgstr "Mark as In Progress"
+
+msgid "暂无更新记录"
+msgstr "No update records"
+
+msgid "当设备进行升级检查和下载时，将自动记录日志"
+msgstr "Logs will be automatically recorded when devices check for and download updates"
+
+msgid "IMEI不可修改"
+msgstr "IMEI cannot be modified"
+
+# 固件管理
+msgid "固件管理"
+msgstr "Firmware Management"
+
+msgid "上传固件"
+msgstr "Upload Firmware"
+
+msgid "文件名"
+msgstr "Filename"
+
+msgid "大小"
+msgstr "Size"
+
+msgid "上传时间"
+msgstr "Upload Time"
+
+msgid "启用"
+msgstr "Enabled"
+
+msgid "禁用"
+msgstr "Disabled"
+
+msgid "暂无固件"
+msgstr "No firmware"
+
+msgid "点击上方的"上传固件"按钮上传您的第一个固件"
+msgstr "Click the \"Upload Firmware\" button above to upload your first firmware"
+
+msgid "您确定要删除版本为"
+msgstr "Are you sure you want to delete the firmware with version"
+
+msgid "的固件吗？"
+msgstr "?"
+
+# 升级规则
+msgid "升级规则"
+msgstr "Update Rules"
+
+msgid "添加规则"
+msgstr "Add Rule"
+
+msgid "暂无升级规则"
+msgstr "No update rules"
+
+msgid "点击上方的"添加规则"按钮创建您的第一个升级规则"
+msgstr "Click the \"Add Rule\" button above to create your first update rule"
+
+msgid "添加升级规则"
+msgstr "Add Update Rule"
+
+msgid "设备当前版本"
+msgstr "Device current version"
+
+msgid "升级后的版本"
+msgstr "Version after upgrade"
+
+msgid "您确定要删除从"
+msgstr "Are you sure you want to delete the rule from"
+
+msgid "到"
+msgstr "to"
+
+msgid "的升级规则吗？"
+msgstr "?"
+
+# 日志记录
+msgid "日志记录"
+msgstr "Logs"
+
+msgid "导出CSV"
+msgstr "Export CSV"
+
+msgid "开始日期"
+msgstr "Start Date"
+
+msgid "结束日期"
+msgstr "End Date"
+
+msgid "项目"
+msgstr "Project"
+
+# 用户管理
+msgid "用户管理"
+msgstr "User Management"
+
+msgid "最后登录"
+msgstr "Last Login"
+
+msgid "您确定要删除用户"
+msgstr "Are you sure you want to delete the user"
+
+msgid "此操作不可逆，删除后将无法恢复。用户创建的所有项目和上传的固件将保留。"
+msgstr "This operation is irreversible. All projects created and firmware uploaded by the user will be retained."
+
+# 首页
+msgid "一个强大的物联网设备固件升级管理平台"
+msgstr "A powerful IoT device firmware upgrade management platform"
+
+msgid "管理您的设备固件版本，配置升级规则，监控升级状态，一站式解决物联网设备的远程升级需求。"
+msgstr "Manage your device firmware versions, configure upgrade rules, monitor upgrade status, one-stop solution for IoT device remote upgrade needs."
+
+msgid "进入仪表盘"
+msgstr "Enter Dashboard"
+
+msgid "为您的物联网设备提供安全、可靠的固件空中升级服务"
+msgstr "Provide secure and reliable firmware over-the-air upgrade services for your IoT devices"
+
+msgid "本系统支持 AIR780E 等设备的固件升级管理，提供版本控制、设备管理和升级日志记录等功能"
+msgstr "This system supports firmware upgrade management for devices such as AIR780E, providing version control, device management, and upgrade log recording functions"
+
+msgid "空中升级"
+msgstr "OTA Upgrade"
+
+msgid "通过网络远程更新设备固件，无需物理接触设备，大幅降低维护成本"
+msgstr "Update device firmware remotely through the network, no need for physical contact with the device, greatly reducing maintenance costs"
+
+msgid "安全可靠"
+msgstr "Secure and Reliable"
+
+msgid "提供设备认证和固件验证机制，确保升级过程的安全性和可靠性"
+msgstr "Provide device authentication and firmware verification mechanisms to ensure the security and reliability of the upgrade process"
+
+msgid "数据统计"
+msgstr "Data Statistics"
+
+msgid "提供详细的设备升级统计和日志记录，帮助您了解设备升级状态"
+msgstr "Provide detailed device upgrade statistics and log records to help you understand the device upgrade status"
+
+msgid "系统信息"
+msgstr "System Information"
+
+msgid "服务器版本"
+msgstr "Server Version"
+
+msgid "API 版本"
+msgstr "API Version"
+
+msgid "支持设备"
+msgstr "Supported Devices"
+
+msgid "多语言支持"
+msgstr "Multilingual Support"
+
+msgid "快速入门"
+msgstr "Quick Start"
+
+msgid "注册并登录账户"
+msgstr "Register and login to your account"
+
+msgid "创建项目并获取项目密钥"
+msgstr "Create a project and get the project key"
+
+msgid "上传新版本固件"
+msgstr "Upload new version firmware"
+
+msgid "配置升级规则"
+msgstr "Configure upgrade rules"
+
+msgid "添加设备或等待设备自动注册"
+msgstr "Add devices or wait for devices to register automatically"
+
+msgid "设备将自动检查并下载更新"
+msgstr "Devices will automatically check for and download updates"
+
+# 其他
+msgid "已向设备 {} 发送升级指令"
+msgstr "Upgrade command sent to device {}"
+
+msgid "您没有权限向此项目添加设备"
+msgstr "You do not have permission to add devices to this project"
+
+msgid "IMEI为 {} 的设备已存在"
+msgstr "Device with IMEI {} already exists"
+
+msgid "设备 {} 添加成功"
+msgstr "Device {} added successfully"
+
+msgid "设备 {} 更新成功"
+msgstr "Device {} updated successfully"
+
+msgid "您没有权限将设备移动到此项目"
+msgstr "You do not have permission to move the device to this project"
+
+msgid "设备 {} 已{}"
+msgstr "Device {} has been {}"
+
+msgid "设备 {} 已删除"
+msgstr "Device {} deleted"
+
+msgid "您没有权限向此项目导入设备"
+msgstr "You do not have permission to import devices to this project"
+
+msgid "成功导入 {} 个设备"
+msgstr "Successfully imported {} devices"
+
+msgid "您没有权限向此项目上传固件"
+msgstr "You do not have permission to upload firmware to this project"
+
+msgid "版本 {} 在项目中已存在"
+msgstr "Version {} already exists in the project"
+
+msgid "固件 {} 上传成功"
+msgstr "Firmware {} uploaded successfully"
+
+msgid "固件 {} 已{}"
+msgstr "Firmware {} has been {}"
+
+msgid "固件 {} 已删除"
+msgstr "Firmware {} deleted"
+
+msgid "您没有权限向此项目添加规则"
+msgstr "You do not have permission to add rules to this project"
+
+msgid "所选固件不属于该项目"
+msgstr "The selected firmware does not belong to this project"
+
+msgid "从 {} 到 {} 的规则在项目中已存在"
+msgstr "Rule from {} to {} already exists in the project"
+
+msgid "升级规则添加成功"
+msgstr "Update rule added successfully"
+
+msgid "规则已{}"
+msgstr "Rule has been {}"
+
+msgid "规则已删除"
+msgstr "Rule deleted"
+
+msgid "您没有权限访问此项目"
+msgstr "You do not have permission to access this project"
+
+msgid "开始日期格式无效"
+msgstr "Invalid start date format"
+
+msgid "结束日期格式无效"
+msgstr "Invalid end date format"
+
+msgid "日志状态已更新"
+msgstr "Log status updated"
+
+msgid "项目创建成功"
+msgstr "Project created successfully"
+
+msgid "项目更新成功"
+msgstr "Project updated successfully"
+
+msgid "项目已删除"
+msgstr "Project deleted"
+
+msgid "用户已添加到项目"
+msgstr "User added to project"
+
+msgid "用户已在项目中"
+msgstr "User already in project"
+
+msgid "不能移除项目创建者"
+msgstr "Cannot remove project creator"
+
+msgid "用户已从项目中移除"
+msgstr "User removed from project"
+
+msgid "登录成功！"
+msgstr "Login successful!"
+
+msgid "登录失败，请检查用户名和密码"
+msgstr "Login failed, please check your username and password"
+
+msgid "您已成功退出登录"
+msgstr "You have successfully logged out"
+
+msgid "注册成功！现在您可以登录了"
+msgstr "Registration successful! You can now log in"
+
+msgid "当前密码不正确"
+msgstr "Current password is incorrect"
+
+msgid "个人资料已更新"
+msgstr "Profile updated"
+
+msgid "用户 {} 的角色已更新为 {}"
+msgstr "User {}'s role has been updated to {}"
+
+msgid "不能删除自己"
+msgstr "Cannot delete yourself"
+
+msgid "用户 {} 已删除"
+msgstr "User {} deleted"

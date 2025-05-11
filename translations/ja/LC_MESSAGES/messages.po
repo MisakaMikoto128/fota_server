@@ -1,0 +1,854 @@
+# Japanese translations for FOTA Server.
+# Copyright (C) 2023 FOTA Server Team
+# This file is distributed under the same license as the FOTA Server project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2023.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: FOTA Server 1.0\n"
+"Report-Msgid-Bugs-To: admin@example.com\n"
+"POT-Creation-Date: 2023-05-11 10:00+0800\n"
+"PO-Revision-Date: 2023-05-11 10:00+0800\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Japanese\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+# 通用
+msgid "保存"
+msgstr "保存"
+
+msgid "取消"
+msgstr "キャンセル"
+
+msgid "确认"
+msgstr "確認"
+
+msgid "删除"
+msgstr "削除"
+
+msgid "编辑"
+msgstr "編集"
+
+msgid "添加"
+msgstr "追加"
+
+msgid "上传"
+msgstr "アップロード"
+
+msgid "下载"
+msgstr "ダウンロード"
+
+msgid "导入"
+msgstr "インポート"
+
+msgid "导出"
+msgstr "エクスポート"
+
+msgid "搜索"
+msgstr "検索"
+
+msgid "重置"
+msgstr "リセット"
+
+msgid "登录"
+msgstr "ログイン"
+
+msgid "注册"
+msgstr "登録"
+
+msgid "退出"
+msgstr "ログアウト"
+
+# 用户相关
+msgid "用户名"
+msgstr "ユーザー名"
+
+msgid "密码"
+msgstr "パスワード"
+
+msgid "确认密码"
+msgstr "パスワード確認"
+
+msgid "电子邮箱"
+msgstr "メールアドレス"
+
+msgid "姓名"
+msgstr "名前"
+
+msgid "头像"
+msgstr "アバター"
+
+msgid "记住我"
+msgstr "ログイン状態を保持"
+
+msgid "当前密码"
+msgstr "現在のパスワード"
+
+msgid "新密码"
+msgstr "新しいパスワード"
+
+msgid "确认新密码"
+msgstr "新しいパスワードの確認"
+
+msgid "保存修改"
+msgstr "変更を保存"
+
+msgid "该用户名已被使用"
+msgstr "このユーザー名は既に使用されています"
+
+msgid "该邮箱已被注册"
+msgstr "このメールアドレスは既に登録されています"
+
+msgid "请输入有效的电子邮箱地址"
+msgstr "有効なメールアドレスを入力してください"
+
+msgid "密码长度至少为6个字符"
+msgstr "パスワードは6文字以上である必要があります"
+
+msgid "两次输入的密码不匹配"
+msgstr "パスワードが一致しません"
+
+# 项目相关
+msgid "项目名称"
+msgstr "プロジェクト名"
+
+msgid "项目描述"
+msgstr "プロジェクト説明"
+
+msgid "项目密钥"
+msgstr "プロジェクトキー"
+
+msgid "所属项目"
+msgstr "所属プロジェクト"
+
+msgid "添加用户到项目"
+msgstr "ユーザーをプロジェクトに追加"
+
+# 固件相关
+msgid "版本号"
+msgstr "バージョン"
+
+msgid "固件文件"
+msgstr "ファームウェアファイル"
+
+msgid "版本描述"
+msgstr "バージョン説明"
+
+msgid "版本号格式必须为xxx.yyy.zzz"
+msgstr "バージョン形式はxxx.yyy.zzzである必要があります"
+
+msgid "只允许上传.bin文件"
+msgstr ".binファイルのみアップロード可能です"
+
+# 设备相关
+msgid "IMEI"
+msgstr "IMEI"
+
+msgid "设备名称"
+msgstr "デバイス名"
+
+msgid "当前版本"
+msgstr "現在のバージョン"
+
+msgid "授权设备"
+msgstr "デバイス認証"
+
+msgid "IMEI必须为15位数字"
+msgstr "IMEIは15桁の数字である必要があります"
+
+msgid "CSV文件"
+msgstr "CSVファイル"
+
+msgid "只允许上传.csv文件"
+msgstr ".csvファイルのみアップロード可能です"
+
+msgid "跳过第一行"
+msgstr "最初の行をスキップ"
+
+# 规则相关
+msgid "起始版本"
+msgstr "開始バージョン"
+
+msgid "目标版本"
+msgstr "目標バージョン"
+
+msgid "固件"
+msgstr "ファームウェア"
+
+msgid "启用规则"
+msgstr "ルールを有効化"
+
+# 语言相关
+msgid "语言"
+msgstr "言語"
+
+msgid "中文"
+msgstr "中国語"
+
+msgid "英文"
+msgstr "英語"
+
+msgid "日文"
+msgstr "日本語"
+
+msgid "切换"
+msgstr "切り替え"
+
+# 错误提示
+msgid "请先登录以访问此页面"
+msgstr "このページにアクセスするにはログインしてください"
+
+msgid "无效的状态"
+msgstr "無効なステータス"
+
+msgid "所有必填字段都必须填写"
+msgstr "すべての必須フィールドを入力する必要があります"
+
+msgid "设备未授权"
+msgstr "デバイスが認証されていません"
+
+msgid "当前已是最新版本"
+msgstr "既に最新バージョンです"
+
+msgid "发现新版本"
+msgstr "新しいバージョンが見つかりました"
+
+msgid "版本号格式错误"
+msgstr "バージョン形式が無効です"
+
+msgid "更新文件不存在"
+msgstr "更新ファイルが存在しません"
+
+# 导航和标题
+msgid "仪表盘"
+msgstr "ダッシュボード"
+
+msgid "项目"
+msgstr "プロジェクト"
+
+msgid "设备"
+msgstr "デバイス"
+
+msgid "固件"
+msgstr "ファームウェア"
+
+msgid "升级规则"
+msgstr "アップグレードルール"
+
+msgid "日志"
+msgstr "ログ"
+
+msgid "用户"
+msgstr "ユーザー"
+
+msgid "个人资料"
+msgstr "プロフィール"
+
+msgid "首页"
+msgstr "ホーム"
+
+msgid "版本"
+msgstr "バージョン"
+
+# 仪表盘
+msgid "最后更新"
+msgstr "最終更新"
+
+msgid "项目数"
+msgstr "プロジェクト数"
+
+msgid "设备数"
+msgstr "デバイス数"
+
+msgid "固件数"
+msgstr "ファームウェア数"
+
+msgid "今日更新"
+msgstr "今日の更新"
+
+msgid "待更新"
+msgstr "保留中の更新"
+
+msgid "版本分布"
+msgstr "バージョン分布"
+
+msgid "最近更新"
+msgstr "最近の更新"
+
+msgid "暂无更新记录"
+msgstr "更新記録がありません"
+
+msgid "查看全部"
+msgstr "すべて表示"
+
+msgid "项目活动"
+msgstr "プロジェクトアクティビティ"
+
+msgid "项目名称"
+msgstr "プロジェクト名"
+
+msgid "设备数"
+msgstr "デバイス数"
+
+msgid "规则数"
+msgstr "ルール数"
+
+msgid "最近更新"
+msgstr "最近の更新"
+
+msgid "从未"
+msgstr "なし"
+
+msgid "操作"
+msgstr "操作"
+
+msgid "暂无项目"
+msgstr "プロジェクトがありません"
+
+msgid "创建项目"
+msgstr "プロジェクト作成"
+
+# 项目管理
+msgid "项目管理"
+msgstr "プロジェクト管理"
+
+msgid "创建新项目"
+msgstr "新しいプロジェクトを作成"
+
+msgid "查看详情"
+msgstr "詳細を表示"
+
+msgid "创建于"
+msgstr "作成日"
+
+msgid "管理"
+msgstr "管理"
+
+msgid "暂无描述"
+msgstr "説明なし"
+
+msgid "项目密钥已复制到剪贴板"
+msgstr "プロジェクトキーがクリップボードにコピーされました"
+
+msgid "项目密钥用于设备识别，自动生成，可点击刷新按钮重新生成"
+msgstr "プロジェクトキーはデバイス識別に使用され、自動生成されます。更新ボタンをクリックして再生成できます"
+
+msgid "警告：修改项目密钥将导致使用旧密钥的设备无法连接"
+msgstr "警告：プロジェクトキーを変更すると、古いキーを使用しているデバイスが接続できなくなります"
+
+msgid "您确定要删除项目"
+msgstr "プロジェクトを削除してもよろしいですか"
+
+msgid "吗？"
+msgstr "？"
+
+msgid "此操作不可逆，删除后将无法恢复。所有关联的设备、固件和升级规则也将被删除。"
+msgstr "この操作は元に戻せません。削除後は復元できません。関連するすべてのデバイス、ファームウェア、アップグレードルールも削除されます。"
+
+msgid "确认删除"
+msgstr "削除を確認"
+
+# 项目详情
+msgid "项目详情"
+msgstr "プロジェクト詳細"
+
+msgid "编辑项目"
+msgstr "プロジェクトを編集"
+
+msgid "删除项目"
+msgstr "プロジェクトを削除"
+
+msgid "项目信息"
+msgstr "プロジェクト情報"
+
+msgid "描述"
+msgstr "説明"
+
+msgid "创建者"
+msgstr "作成者"
+
+msgid "创建时间"
+msgstr "作成時間"
+
+msgid "未知"
+msgstr "不明"
+
+msgid "项目成员"
+msgstr "プロジェクトメンバー"
+
+msgid "添加成员"
+msgstr "メンバーを追加"
+
+msgid "邮箱"
+msgstr "メールアドレス"
+
+msgid "角色"
+msgstr "役割"
+
+msgid "确定要从项目中移除此用户吗？"
+msgstr "このユーザーをプロジェクトから削除してもよろしいですか？"
+
+msgid "暂无项目成员"
+msgstr "プロジェクトメンバーがいません"
+
+msgid "快速链接"
+msgstr "クイックリンク"
+
+msgid "管理设备"
+msgstr "デバイス管理"
+
+msgid "个设备"
+msgstr "デバイス"
+
+msgid "管理固件"
+msgstr "ファームウェア管理"
+
+msgid "个固件"
+msgstr "ファームウェア"
+
+msgid "管理升级规则"
+msgstr "アップグレードルール管理"
+
+msgid "个规则"
+msgstr "ルール"
+
+msgid "添加项目成员"
+msgstr "プロジェクトメンバーを追加"
+
+msgid "选择用户"
+msgstr "ユーザーを選択"
+
+msgid "用户已添加到项目"
+msgstr "ユーザーがプロジェクトに追加されました"
+
+msgid "用户已在项目中"
+msgstr "ユーザーは既にプロジェクト内にいます"
+
+msgid "不能移除项目创建者"
+msgstr "プロジェクト作成者を削除できません"
+
+msgid "用户已从项目中移除"
+msgstr "ユーザーがプロジェクトから削除されました"
+
+# 设备管理
+msgid "设备管理"
+msgstr "デバイス管理"
+
+msgid "批量导入"
+msgstr "一括インポート"
+
+msgid "添加设备"
+msgstr "デバイスを追加"
+
+msgid "全部"
+msgstr "すべて"
+
+msgid "已授权"
+msgstr "認証済み"
+
+msgid "未授权"
+msgstr "未認証"
+
+msgid "全部项目"
+msgstr "すべてのプロジェクト"
+
+msgid "名称"
+msgstr "名前"
+
+msgid "最后检查时间"
+msgstr "最終チェック時間"
+
+msgid "最后更新时间"
+msgstr "最終更新時間"
+
+msgid "状态"
+msgstr "ステータス"
+
+msgid "启动升级"
+msgstr "アップグレード開始"
+
+msgid "暂无设备"
+msgstr "デバイスがありません"
+
+msgid "点击上方的"添加设备"按钮添加您的第一个设备，或者使用"批量导入"功能"
+msgstr "上の「デバイスを追加」ボタンをクリックして最初のデバイスを追加するか、「一括インポート」機能を使用してください"
+
+msgid "可选"
+msgstr "オプション"
+
+msgid "版本号格式为xxx.yyy.zzz"
+msgstr "バージョン形式はxxx.yyy.zzzです"
+
+msgid "只有授权的设备才能获取更新"
+msgstr "認証されたデバイスのみが更新を取得できます"
+
+msgid "批量导入设备"
+msgstr "デバイスの一括インポート"
+
+msgid "CSV文件格式：IMEI,设备名称,当前版本,是否授权"
+msgstr "CSVファイル形式：IMEI,デバイス名,現在のバージョン,認証状態"
+
+msgid "如果CSV文件包含标题行，请勾选此项"
+msgstr "CSVファイルにヘッダー行が含まれている場合は、このオプションをチェックしてください"
+
+msgid "您确定要删除IMEI为"
+msgstr "IMEIが"
+
+msgid "的设备吗？"
+msgstr "のデバイスを削除してもよろしいですか？"
+
+msgid "此操作不可逆，删除后将无法恢复。所有关联的更新日志也将被删除。"
+msgstr "この操作は元に戻せません。削除後は復元できません。関連するすべての更新ログも削除されます。"
+
+# 设备详情
+msgid "设备详情"
+msgstr "デバイス詳細"
+
+msgid "编辑设备"
+msgstr "デバイスを編集"
+
+msgid "删除设备"
+msgstr "デバイスを削除"
+
+msgid "设备信息"
+msgstr "デバイス情報"
+
+msgid "授权状态"
+msgstr "認証状態"
+
+msgid "禁用"
+msgstr "無効化"
+
+msgid "授权"
+msgstr "認証"
+
+msgid "更新日志"
+msgstr "更新ログ"
+
+msgid "时间"
+msgstr "時間"
+
+msgid "从版本"
+msgstr "元のバージョン"
+
+msgid "到版本"
+msgstr "新しいバージョン"
+
+msgid "成功"
+msgstr "成功"
+
+msgid "失败"
+msgstr "失敗"
+
+msgid "进行中"
+msgstr "進行中"
+
+msgid "标记为成功"
+msgstr "成功としてマーク"
+
+msgid "标记为失败"
+msgstr "失敗としてマーク"
+
+msgid "标记为进行中"
+msgstr "進行中としてマーク"
+
+msgid "暂无更新记录"
+msgstr "更新記録がありません"
+
+msgid "当设备进行升级检查和下载时，将自动记录日志"
+msgstr "デバイスがアップグレードをチェックしてダウンロードすると、自動的にログが記録されます"
+
+msgid "IMEI不可修改"
+msgstr "IMEIは変更できません"
+
+# 固件管理
+msgid "固件管理"
+msgstr "ファームウェア管理"
+
+msgid "上传固件"
+msgstr "ファームウェアをアップロード"
+
+msgid "文件名"
+msgstr "ファイル名"
+
+msgid "大小"
+msgstr "サイズ"
+
+msgid "上传时间"
+msgstr "アップロード時間"
+
+msgid "启用"
+msgstr "有効"
+
+msgid "禁用"
+msgstr "無効"
+
+msgid "暂无固件"
+msgstr "ファームウェアがありません"
+
+msgid "点击上方的"上传固件"按钮上传您的第一个固件"
+msgstr "上の「ファームウェアをアップロード」ボタンをクリックして最初のファームウェアをアップロードしてください"
+
+msgid "您确定要删除版本为"
+msgstr "バージョンが"
+
+msgid "的固件吗？"
+msgstr "のファームウェアを削除してもよろしいですか？"
+
+# 升级规则
+msgid "升级规则"
+msgstr "アップグレードルール"
+
+msgid "添加规则"
+msgstr "ルールを追加"
+
+msgid "暂无升级规则"
+msgstr "アップグレードルールがありません"
+
+msgid "点击上方的"添加规则"按钮创建您的第一个升级规则"
+msgstr "上の「ルールを追加」ボタンをクリックして最初のアップグレードルールを作成してください"
+
+msgid "添加升级规则"
+msgstr "アップグレードルールを追加"
+
+msgid "设备当前版本"
+msgstr "デバイスの現在のバージョン"
+
+msgid "升级后的版本"
+msgstr "アップグレード後のバージョン"
+
+msgid "您确定要删除从"
+msgstr "バージョン"
+
+msgid "到"
+msgstr "から"
+
+msgid "的升级规则吗？"
+msgstr "へのアップグレードルールを削除してもよろしいですか？"
+
+# 日志记录
+msgid "日志记录"
+msgstr "ログ記録"
+
+msgid "导出CSV"
+msgstr "CSVをエクスポート"
+
+msgid "开始日期"
+msgstr "開始日"
+
+msgid "结束日期"
+msgstr "終了日"
+
+msgid "项目"
+msgstr "プロジェクト"
+
+# 用户管理
+msgid "用户管理"
+msgstr "ユーザー管理"
+
+msgid "最后登录"
+msgstr "最終ログイン"
+
+msgid "您确定要删除用户"
+msgstr "ユーザー"
+
+msgid "此操作不可逆，删除后将无法恢复。用户创建的所有项目和上传的固件将保留。"
+msgstr "この操作は元に戻せません。削除後は復元できません。ユーザーが作成したすべてのプロジェクトとアップロードしたファームウェアは保持されます。"
+
+# 首页
+msgid "一个强大的物联网设备固件升级管理平台"
+msgstr "強力なIoTデバイスファームウェアアップグレード管理プラットフォーム"
+
+msgid "管理您的设备固件版本，配置升级规则，监控升级状态，一站式解决物联网设备的远程升级需求。"
+msgstr "デバイスファームウェアバージョンを管理し、アップグレードルールを設定し、アップグレードステータスを監視し、IoTデバイスのリモートアップグレードニーズをワンストップで解決します。"
+
+msgid "进入仪表盘"
+msgstr "ダッシュボードに入る"
+
+msgid "为您的物联网设备提供安全、可靠的固件空中升级服务"
+msgstr "IoTデバイスに安全で信頼性の高いファームウェア無線アップグレードサービスを提供"
+
+msgid "本系统支持 AIR780E 等设备的固件升级管理，提供版本控制、设备管理和升级日志记录等功能"
+msgstr "このシステムはAIR780Eなどのデバイスのファームウェアアップグレード管理をサポートし、バージョン管理、デバイス管理、アップグレードログ記録などの機能を提供します"
+
+msgid "空中升级"
+msgstr "OTAアップグレード"
+
+msgid "通过网络远程更新设备固件，无需物理接触设备，大幅降低维护成本"
+msgstr "ネットワークを介してデバイスファームウェアをリモートで更新し、デバイスとの物理的な接触を必要とせず、メンテナンスコストを大幅に削減"
+
+msgid "安全可靠"
+msgstr "安全で信頼性が高い"
+
+msgid "提供设备认证和固件验证机制，确保升级过程的安全性和可靠性"
+msgstr "デバイス認証とファームウェア検証メカニズムを提供し、アップグレードプロセスの安全性と信頼性を確保"
+
+msgid "数据统计"
+msgstr "データ統計"
+
+msgid "提供详细的设备升级统计和日志记录，帮助您了解设备升级状态"
+msgstr "詳細なデバイスアップグレード統計とログ記録を提供し、デバイスのアップグレードステータスを理解するのに役立ちます"
+
+msgid "系统信息"
+msgstr "システム情報"
+
+msgid "服务器版本"
+msgstr "サーバーバージョン"
+
+msgid "API 版本"
+msgstr "APIバージョン"
+
+msgid "支持设备"
+msgstr "サポートデバイス"
+
+msgid "多语言支持"
+msgstr "多言語サポート"
+
+msgid "快速入门"
+msgstr "クイックスタート"
+
+msgid "注册并登录账户"
+msgstr "アカウントを登録してログイン"
+
+msgid "创建项目并获取项目密钥"
+msgstr "プロジェクトを作成してプロジェクトキーを取得"
+
+msgid "上传新版本固件"
+msgstr "新しいバージョンのファームウェアをアップロード"
+
+msgid "配置升级规则"
+msgstr "アップグレードルールを設定"
+
+msgid "添加设备或等待设备自动注册"
+msgstr "デバイスを追加するか、デバイスが自動登録されるのを待つ"
+
+msgid "设备将自动检查并下载更新"
+msgstr "デバイスは自動的に更新をチェックしてダウンロードします"
+
+# 其他
+msgid "已向设备 {} 发送升级指令"
+msgstr "デバイス {} にアップグレードコマンドを送信しました"
+
+msgid "您没有权限向此项目添加设备"
+msgstr "このプロジェクトにデバイスを追加する権限がありません"
+
+msgid "IMEI为 {} 的设备已存在"
+msgstr "IMEIが {} のデバイスは既に存在します"
+
+msgid "设备 {} 添加成功"
+msgstr "デバイス {} が正常に追加されました"
+
+msgid "设备 {} 更新成功"
+msgstr "デバイス {} が正常に更新されました"
+
+msgid "您没有权限将设备移动到此项目"
+msgstr "デバイスをこのプロジェクトに移動する権限がありません"
+
+msgid "设备 {} 已{}"
+msgstr "デバイス {} は {} されました"
+
+msgid "设备 {} 已删除"
+msgstr "デバイス {} が削除されました"
+
+msgid "您没有权限向此项目导入设备"
+msgstr "このプロジェクトにデバイスをインポートする権限がありません"
+
+msgid "成功导入 {} 个设备"
+msgstr "{} 台のデバイスが正常にインポートされました"
+
+msgid "您没有权限向此项目上传固件"
+msgstr "このプロジェクトにファームウェアをアップロードする権限がありません"
+
+msgid "版本 {} 在项目中已存在"
+msgstr "バージョン {} はプロジェクト内に既に存在します"
+
+msgid "固件 {} 上传成功"
+msgstr "ファームウェア {} が正常にアップロードされました"
+
+msgid "固件 {} 已{}"
+msgstr "ファームウェア {} は {} されました"
+
+msgid "固件 {} 已删除"
+msgstr "ファームウェア {} が削除されました"
+
+msgid "您没有权限向此项目添加规则"
+msgstr "このプロジェクトにルールを追加する権限がありません"
+
+msgid "所选固件不属于该项目"
+msgstr "選択したファームウェアはこのプロジェクトに属していません"
+
+msgid "从 {} 到 {} 的规则在项目中已存在"
+msgstr "{} から {} へのルールはプロジェクト内に既に存在します"
+
+msgid "升级规则添加成功"
+msgstr "アップグレードルールが正常に追加されました"
+
+msgid "规则已{}"
+msgstr "ルールは {} されました"
+
+msgid "规则已删除"
+msgstr "ルールが削除されました"
+
+msgid "您没有权限访问此项目"
+msgstr "このプロジェクトにアクセスする権限がありません"
+
+msgid "开始日期格式无效"
+msgstr "開始日の形式が無効です"
+
+msgid "结束日期格式无效"
+msgstr "終了日の形式が無効です"
+
+msgid "日志状态已更新"
+msgstr "ログステータスが更新されました"
+
+msgid "项目创建成功"
+msgstr "プロジェクトが正常に作成されました"
+
+msgid "项目更新成功"
+msgstr "プロジェクトが正常に更新されました"
+
+msgid "项目已删除"
+msgstr "プロジェクトが削除されました"
+
+msgid "用户已添加到项目"
+msgstr "ユーザーがプロジェクトに追加されました"
+
+msgid "用户已在项目中"
+msgstr "ユーザーは既にプロジェクト内にいます"
+
+msgid "不能移除项目创建者"
+msgstr "プロジェクト作成者を削除できません"
+
+msgid "用户已从项目中移除"
+msgstr "ユーザーがプロジェクトから削除されました"
+
+msgid "登录成功！"
+msgstr "ログイン成功！"
+
+msgid "登录失败，请检查用户名和密码"
+msgstr "ログインに失敗しました。ユーザー名とパスワードを確認してください"
+
+msgid "您已成功退出登录"
+msgstr "正常にログアウトしました"
+
+msgid "注册成功！现在您可以登录了"
+msgstr "登録成功！今すぐログインできます"
+
+msgid "当前密码不正确"
+msgstr "現在のパスワードが正しくありません"
+
+msgid "个人资料已更新"
+msgstr "プロフィールが更新されました"
+
+msgid "用户 {} 的角色已更新为 {}"
+msgstr "ユーザー {} の役割が {} に更新されました"
+
+msgid "不能删除自己"
+msgstr "自分自身を削除することはできません"
+
+msgid "用户 {} 已删除"
+msgstr "ユーザー {} が削除されました"
