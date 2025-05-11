@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ _('登录') }} - FOTA 固件升级服务器{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="bi bi-box-arrow-in-right me-2"></i>{{ _('登录') }}</h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" action="{{ url_for('auth.login') }}">
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        <label for="username" class="form-label">{{ _('用户名') }}</label>
+                        {{ form.username(class="form-control", placeholder=_('请输入用户名')) }}
+                        {% for error in form.username.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">{{ _('密码') }}</label>
+                        {{ form.password(class="form-control", placeholder=_('请输入密码')) }}
+                        {% for error in form.password.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="mb-3 form-check">
+                        {{ form.remember(class="form-check-input") }}
+                        <label class="form-check-label" for="remember">{{ _('记住我') }}</label>
+                    </div>
+                    <div class="d-grid gap-2">
+                        {{ form.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-center">
+                <p class="mb-0">{{ _('还没有账号？') }} <a href="{{ url_for('auth.register') }}">{{ _('立即注册') }}</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

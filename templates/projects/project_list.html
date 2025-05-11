@@ -1,0 +1,262 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ _('项目管理') }} - FOTA 固件升级服务器{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-folder me-2"></i>{{ _('项目管理') }}</h1>
+    <div>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProjectModal">
+            <i class="bi bi-plus-circle me-2"></i>{{ _('创建项目') }}
+        </button>
+    </div>
+</div>
+
+{% if projects %}
+<div class="row">
+    {% for project in projects %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-primary text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">{{ project.name }}</h5>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-primary" type="button" id="dropdownMenuButton{{ project.id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-three-dots-vertical"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton{{ project.id }}">
+                            <li><a class="dropdown-item" href="{{ url_for('projects.project_detail', project_id=project.id) }}">
+                                <i class="bi bi-eye me-2"></i>{{ _('查看详情') }}
+                            </a></li>
+                            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editProjectModal" 
+                                   data-project-id="{{ project.id }}" 
+                                   data-project-name="{{ project.name }}" 
+                                   data-project-description="{{ project.description }}" 
+                                   data-project-key="{{ project.project_key }}">
+                                <i class="bi bi-pencil me-2"></i>{{ _('编辑') }}
+                            </a></li>
+                            {% if current_user.is_administrator() or project.created_by_id == current_user.id %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#deleteProjectModal" 
+                                   data-project-id="{{ project.id }}" 
+                                   data-project-name="{{ project.name }}">
+                                <i class="bi bi-trash me-2"></i>{{ _('删除') }}
+                            </a></li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <h6 class="text-muted mb-2">{{ _('项目密钥') }}:</h6>
+                    <div class="input-group">
+                        <input type="text" class="form-control form-control-sm" value="{{ project.project_key }}" readonly>
+                        <button class="btn btn-outline-secondary btn-sm copy-btn" type="button" data-clipboard-text="{{ project.project_key }}">
+                            <i class="bi bi-clipboard"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <h6 class="text-muted mb-2">{{ _('描述') }}:</h6>
+                    <p class="card-text">{{ project.description or _('暂无描述') }}</p>
+                </div>
+                <div class="row text-center">
+                    <div class="col-4">
+                        <h5>{{ project.devices.count() }}</h5>
+                        <small class="text-muted">{{ _('设备') }}</small>
+                    </div>
+                    <div class="col-4">
+                        <h5>{{ project.firmwares.count() }}</h5>
+                        <small class="text-muted">{{ _('固件') }}</small>
+                    </div>
+                    <div class="col-4">
+                        <h5>{{ project.update_rules.count() }}</h5>
+                        <small class="text-muted">{{ _('规则') }}</small>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent">
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">{{ _('创建于') }}: {{ project.created_at.strftime('%Y-%m-%d') }}</small>
+                    <a href="{{ url_for('projects.project_detail', project_id=project.id) }}" class="btn btn-sm btn-outline-primary">
+                        {{ _('管理') }} <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card shadow-sm">
+    <div class="card-body text-center py-5">
+        <i class="bi bi-folder-x text-muted" style="font-size: 4rem;"></i>
+        <h4 class="mt-3 text-muted">{{ _('暂无项目') }}</h4>
+        <p class="text-muted">{{ _('点击上方的"创建项目"按钮创建您的第一个项目') }}</p>
+        <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#addProjectModal">
+            <i class="bi bi-plus-circle me-2"></i>{{ _('创建项目') }}
+        </button>
+    </div>
+</div>
+{% endif %}
+
+<!-- 添加项目模态框 -->
+<div class="modal fade" id="addProjectModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>{{ _('创建新项目') }}</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('projects.add_project') }}">
+                {{ form.hidden_tag() }}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">{{ _('项目名称') }} <span class="text-danger">*</span></label>
+                        {{ form.name(class="form-control", placeholder=_('请输入项目名称')) }}
+                        {% for error in form.name.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">{{ _('项目描述') }}</label>
+                        {{ form.description(class="form-control", rows=3, placeholder=_('请输入项目描述（可选）')) }}
+                        {% for error in form.description.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="mb-3">
+                        <label for="project_key" class="form-label">{{ _('项目密钥') }}</label>
+                        <div class="input-group">
+                            {{ form.project_key(class="form-control", readonly=true) }}
+                            <button class="btn btn-outline-secondary refresh-key-btn" type="button">
+                                <i class="bi bi-arrow-repeat"></i>
+                            </button>
+                        </div>
+                        <div class="form-text">{{ _('项目密钥用于设备识别，自动生成，可点击刷新按钮重新生成') }}</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('取消') }}</button>
+                    {{ form.submit(class="btn btn-primary") }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 编辑项目模态框 -->
+<div class="modal fade" id="editProjectModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="bi bi-pencil me-2"></i>{{ _('编辑项目') }}</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('projects.edit_project', project_id=0) }}" id="editProjectForm">
+                {{ form.hidden_tag() }}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">{{ _('项目名称') }} <span class="text-danger">*</span></label>
+                        {{ form.name(class="form-control", id="edit_name") }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">{{ _('项目描述') }}</label>
+                        {{ form.description(class="form-control", rows=3, id="edit_description") }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="project_key" class="form-label">{{ _('项目密钥') }}</label>
+                        {{ form.project_key(class="form-control", id="edit_project_key") }}
+                        <div class="form-text">{{ _('警告：修改项目密钥将导致使用旧密钥的设备无法连接') }}</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('取消') }}</button>
+                    {{ form.submit(class="btn btn-primary") }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 删除项目确认模态框 -->
+<div class="modal fade" id="deleteProjectModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="bi bi-exclamation-triangle me-2"></i>{{ _('删除确认') }}</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>{{ _('您确定要删除项目') }} <span id="deleteProjectName" class="fw-bold"></span> {{ _('吗？') }}</p>
+                <p class="text-danger">{{ _('此操作不可逆，删除后将无法恢复。所有关联的设备、固件和升级规则也将被删除。') }}</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('取消') }}</button>
+                <a href="#" id="confirmDeleteProject" class="btn btn-danger">
+                    <i class="bi bi-trash me-2"></i>{{ _('确认删除') }}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.8/dist/clipboard.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 复制到剪贴板
+    var clipboard = new ClipboardJS('.copy-btn');
+    clipboard.on('success', function(e) {
+        alert("{{ _('项目密钥已复制到剪贴板') }}");
+        e.clearSelection();
+    });
+    
+    // 刷新项目密钥
+    document.querySelectorAll('.refresh-key-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var keyInput = this.parentNode.querySelector('input');
+            fetch('/api/generate_project_key')
+                .then(response => response.json())
+                .then(data => {
+                    keyInput.value = data.project_key;
+                });
+        });
+    });
+    
+    // 编辑项目模态框
+    const editProjectModal = document.getElementById('editProjectModal');
+    if (editProjectModal) {
+        editProjectModal.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            const projectId = button.getAttribute('data-project-id');
+            const projectName = button.getAttribute('data-project-name');
+            const projectDescription = button.getAttribute('data-project-description');
+            const projectKey = button.getAttribute('data-project-key');
+            
+            document.getElementById('edit_name').value = projectName;
+            document.getElementById('edit_description').value = projectDescription;
+            document.getElementById('edit_project_key').value = projectKey;
+            
+            const form = document.getElementById('editProjectForm');
+            form.action = "{{ url_for('projects.edit_project', project_id=0) }}".replace('0', projectId);
+        });
+    }
+    
+    // 删除项目确认模态框
+    const deleteProjectModal = document.getElementById('deleteProjectModal');
+    if (deleteProjectModal) {
+        deleteProjectModal.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            const projectId = button.getAttribute('data-project-id');
+            const projectName = button.getAttribute('data-project-name');
+            
+            document.getElementById('deleteProjectName').textContent = projectName;
+            document.getElementById('confirmDeleteProject').href = "{{ url_for('projects.delete_project', project_id=0) }}".replace('0', projectId);
+        });
+    }
+});
+</script>
+{% endblock %}

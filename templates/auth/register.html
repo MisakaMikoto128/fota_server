@@ -1,0 +1,61 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ _('注册') }} - FOTA 固件升级服务器{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="bi bi-person-plus me-2"></i>{{ _('注册新账号') }}</h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" action="{{ url_for('auth.register') }}">
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        <label for="username" class="form-label">{{ _('用户名') }} <span class="text-danger">*</span></label>
+                        {{ form.username(class="form-control", placeholder=_('请输入用户名（3-20个字符）')) }}
+                        {% for error in form.username.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">{{ _('电子邮箱') }} <span class="text-danger">*</span></label>
+                        {{ form.email(class="form-control", placeholder=_('请输入有效的电子邮箱地址')) }}
+                        {% for error in form.email.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="mb-3">
+                        <label for="name" class="form-label">{{ _('姓名') }}</label>
+                        {{ form.name(class="form-control", placeholder=_('请输入您的姓名（可选）')) }}
+                        {% for error in form.name.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">{{ _('密码') }} <span class="text-danger">*</span></label>
+                        {{ form.password(class="form-control", placeholder=_('请输入密码（至少6个字符）')) }}
+                        {% for error in form.password.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="mb-3">
+                        <label for="password2" class="form-label">{{ _('确认密码') }} <span class="text-danger">*</span></label>
+                        {{ form.password2(class="form-control", placeholder=_('请再次输入密码')) }}
+                        {% for error in form.password2.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="d-grid gap-2">
+                        {{ form.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-center">
+                <p class="mb-0">{{ _('已有账号？') }} <a href="{{ url_for('auth.login') }}">{{ _('立即登录') }}</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
