@@ -15,6 +15,7 @@ from firmware import firmware_bp
 from rules import rules_bp
 from logs import logs_bp
 from api import api_bp
+from api_ajax import api_ajax_bp
 
 def create_app(config_name='default'):
     """创建Flask应用"""
@@ -48,6 +49,7 @@ def create_app(config_name='default'):
     app.register_blueprint(rules_bp)
     app.register_blueprint(logs_bp)
     app.register_blueprint(api_bp)
+    app.register_blueprint(api_ajax_bp)
 
     # 用户加载函数
     @login_manager.user_loader
@@ -110,4 +112,21 @@ def create_app(config_name='default'):
 
 if __name__ == '__main__':
     app = create_app(os.getenv('FLASK_CONFIG') or 'default')
-    app.run(host='0.0.0.0', port=5000, debug=True)
+
+    # 获取配置
+    config_name = os.getenv('FLASK_CONFIG') or 'default'
+    config_obj = config[config_name]
+
+    # 检查是否启用HTTPS
+    ssl_context = None
+    if config_obj.ENABLE_HTTPS and hasattr(app.config, 'SSL_CONTEXT'):
+        ssl_context = app.config['SSL_CONTEXT']
+        print("HTTPS已启用")
+
+    # 启动应用
+    app.run(
+        host='0.0.0.0',
+        port=5000,
+        debug=config_obj.DEBUG if hasattr(config_obj, 'DEBUG') else False,
+        ssl_context=ssl_context
+    )

@@ -95,17 +95,18 @@
                                 <a href="{{ url_for('devices.device_detail', device_id=device.id) }}" class="btn btn-sm btn-outline-primary">
                                     <i class="bi bi-eye"></i>
                                 </a>
-                                <a href="{{ url_for('devices.toggle_device_auth', device_id=device.id) }}" class="btn btn-sm btn-outline-warning">
+                                <button type="button" class="btn btn-sm btn-outline-warning toggle-device-auth-btn"
+                                        data-device-id="{{ device.id }}" data-is-authorized="{{ device.is_authorized|int }}">
                                     {% if device.is_authorized %}
                                     <i class="bi bi-lock"></i>
                                     {% else %}
                                     <i class="bi bi-unlock"></i>
                                     {% endif %}
-                                </a>
+                                </button>
                                 <a href="{{ url_for('devices.start_upgrade', device_id=device.id) }}" class="btn btn-sm btn-outline-success">
                                     <i class="bi bi-arrow-up-circle"></i>
                                 </a>
-                                <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteDeviceModal" 
+                                <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteDeviceModal"
                                         data-device-id="{{ device.id }}" data-device-imei="{{ device.imei }}">
                                     <i class="bi bi-trash"></i>
                                 </button>
@@ -117,7 +118,7 @@
             </table>
         </div>
     </div>
-    
+
     <!-- 分页 -->
     {% if pagination.pages > 1 %}
     <div class="card-footer">
@@ -136,7 +137,7 @@
                     </a>
                 </li>
                 {% endif %}
-                
+
                 {% for page in pagination.iter_pages() %}
                     {% if page %}
                         {% if page != pagination.page %}
@@ -154,7 +155,7 @@
                         </li>
                     {% endif %}
                 {% endfor %}
-                
+
                 {% if pagination.has_next %}
                 <li class="page-item">
                     <a class="page-link" href="{{ url_for('devices.device_list', page=pagination.next_num, **request.args) }}" aria-label="Next">
@@ -321,10 +322,104 @@ document.addEventListener('DOMContentLoaded', function() {
             const button = event.relatedTarget;
             const deviceId = button.getAttribute('data-device-id');
             const deviceImei = button.getAttribute('data-device-imei');
-            
+
             document.getElementById('deleteDeviceImei').textContent = deviceImei;
             document.getElementById('confirmDeleteDevice').href = "{{ url_for('devices.delete_device', device_id=0) }}".replace('0', deviceId);
         });
+    }
+
+    // 授权/禁用设备按钮
+    document.querySelectorAll('.toggle-device-auth-btn').forEach(function(button) {
+        button.addEventListener('click', function() {
+            const deviceId = this.getAttribute('data-device-id');
+            const isAuthorized = this.getAttribute('data-is-authorized') === '1';
+            const icon = this.querySelector('i');
+            const statusBadge = this.closest('tr').querySelector('.badge');
+
+            // 发送AJAX请求
+            fetch('/api/ajax/toggle_device_auth', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    device_id: deviceId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // 更新按钮状态
+                    this.setAttribute('data-is-authorized', data.is_authorized ? '1' : '0');
+
+                    // 更新图标
+                    if (data.is_authorized) {
+                        icon.className = 'bi bi-lock';
+                        statusBadge.className = 'badge bg-success';
+                        statusBadge.textContent = '{{ _('已授权') }}';
+                    } else {
+                        icon.className = 'bi bi-unlock';
+                        statusBadge.className = 'badge bg-danger';
+                        statusBadge.textContent = '{{ _('未授权') }}';
+                    }
+
+                    // 显示成功消息
+                    showToast(data.message, 'success');
+                } else {
+                    // 显示错误消息
+                    showToast(data.message, 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('{{ _('操作失败，请重试') }}', 'danger');
+            });
+        });
+    });
+
+    // 显示提示消息
+    function showToast(message, type) {
+        // 创建toast元素
+        const toastContainer = document.getElementById('toast-container') || createToastContainer();
+        const toast = document.createElement('div');
+        toast.className = `toast align-items-center text-white bg-${type} border-0`;
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+        toast.setAttribute('aria-atomic', 'true');
+
+        toast.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        `;
+
+        toastContainer.appendChild(toast);
+
+        // 初始化并显示toast
+        const bsToast = new bootstrap.Toast(toast, {
+            autohide: true,
+            delay: 3000
+        });
+        bsToast.show();
+
+        // 自动移除
+        toast.addEventListener('hidden.bs.toast', function() {
+            this.remove();
+        });
+    }
+
+    // 创建toast容器
+    function createToastContainer() {
+        const container = document.createElement('div');
+        container.id = 'toast-container';
+        container.className = 'toast-container position-fixed top-0 end-0 p-3';
+        container.style.zIndex = '1050';
+        document.body.appendChild(container);
+        return container;
     }
 });
 </script>

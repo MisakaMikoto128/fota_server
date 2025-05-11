@@ -81,14 +81,15 @@
                         </td>
                         <td>
                             <div class="btn-group">
-                                <a href="{{ url_for('rules.toggle_rule', rule_id=rule.id) }}" class="btn btn-sm btn-outline-warning">
+                                <button type="button" class="btn btn-sm btn-outline-warning toggle-rule-btn"
+                                        data-rule-id="{{ rule.id }}" data-is-active="{{ rule.is_active|int }}">
                                     {% if rule.is_active %}
                                     <i class="bi bi-toggle-on"></i>
                                     {% else %}
                                     <i class="bi bi-toggle-off"></i>
                                     {% endif %}
-                                </a>
-                                <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteRuleModal" 
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteRuleModal"
                                         data-rule-id="{{ rule.id }}" data-rule-from="{{ rule.from_version }}" data-rule-to="{{ rule.to_version }}">
                                     <i class="bi bi-trash"></i>
                                 </button>
@@ -203,34 +204,84 @@ document.addEventListener('DOMContentLoaded', function() {
             const ruleId = button.getAttribute('data-rule-id');
             const ruleFrom = button.getAttribute('data-rule-from');
             const ruleTo = button.getAttribute('data-rule-to');
-            
+
             document.getElementById('deleteRuleFrom').textContent = ruleFrom;
             document.getElementById('deleteRuleTo').textContent = ruleTo;
             document.getElementById('confirmDeleteRule').href = "{{ url_for('rules.delete_rule', rule_id=0) }}".replace('0', ruleId);
         });
     }
-    
+
+    // 启用/禁用规则按钮
+    document.querySelectorAll('.toggle-rule-btn').forEach(function(button) {
+        button.addEventListener('click', function() {
+            const ruleId = this.getAttribute('data-rule-id');
+            const isActive = this.getAttribute('data-is-active') === '1';
+            const icon = this.querySelector('i');
+            const statusBadge = this.closest('tr').querySelector('.badge');
+
+            // 发送AJAX请求
+            fetch('/api/ajax/toggle_rule', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    rule_id: ruleId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // 更新按钮状态
+                    this.setAttribute('data-is-active', data.is_active ? '1' : '0');
+
+                    // 更新图标
+                    if (data.is_active) {
+                        icon.className = 'bi bi-toggle-on';
+                        statusBadge.className = 'badge bg-success';
+                        statusBadge.textContent = '{{ _('启用') }}';
+                    } else {
+                        icon.className = 'bi bi-toggle-off';
+                        statusBadge.className = 'badge bg-danger';
+                        statusBadge.textContent = '{{ _('禁用') }}';
+                    }
+
+                    // 显示成功消息
+                    showToast(data.message, 'success');
+                } else {
+                    // 显示错误消息
+                    showToast(data.message, 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('{{ _('操作失败，请重试') }}', 'danger');
+            });
+        });
+    });
+
     // 项目选择变化时更新固件列表
     const projectSelect = document.getElementById('project_select');
     const firmwareSelect = document.getElementById('firmware_select');
-    
+
     if (projectSelect && firmwareSelect) {
         projectSelect.addEventListener('change', function() {
             const projectId = this.value;
-            
+
             // 清空固件选择
             firmwareSelect.innerHTML = '';
-            
+
             if (projectId) {
                 // 获取项目的固件列表
                 fetch(`/update_rules/get_firmwares/${projectId}`)
                     .then(response => response.json())
                     .then(data => {
                         if (data.error) {
-                            alert(data.error);
+                            showToast(data.error, 'danger');
                             return;
                         }
-                        
+
                         // 添加固件选项
                         data.firmwares.forEach(firmware => {
                             const option = document.createElement('option');
@@ -241,9 +292,54 @@ document.addEventListener('DOMContentLoaded', function() {
                     })
                     .catch(error => {
                         console.error('Error fetching firmwares:', error);
+                        showToast('{{ _('获取固件列表失败') }}', 'danger');
                     });
             }
         });
+    }
+
+    // 显示提示消息
+    function showToast(message, type) {
+        // 创建toast元素
+        const toastContainer = document.getElementById('toast-container') || createToastContainer();
+        const toast = document.createElement('div');
+        toast.className = `toast align-items-center text-white bg-${type} border-0`;
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+        toast.setAttribute('aria-atomic', 'true');
+
+        toast.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        `;
+
+        toastContainer.appendChild(toast);
+
+        // 初始化并显示toast
+        const bsToast = new bootstrap.Toast(toast, {
+            autohide: true,
+            delay: 3000
+        });
+        bsToast.show();
+
+        // 自动移除
+        toast.addEventListener('hidden.bs.toast', function() {
+            this.remove();
+        });
+    }
+
+    // 创建toast容器
+    function createToastContainer() {
+        const container = document.createElement('div');
+        container.id = 'toast-container';
+        container.className = 'toast-container position-fixed top-0 end-0 p-3';
+        container.style.zIndex = '1050';
+        document.body.appendChild(container);
+        return container;
     }
 });
 </script>

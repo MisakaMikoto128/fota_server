@@ -12,6 +12,8 @@ FOTA（Firmware Over-The-Air）固件升级服务器是一个基于Flask的Web�
 - **动漫头像**：自动生成美观的动漫风格用户头像
 - **多语言支持**：支持中文、英文和日文界面
 - **响应式界面**：适配桌面和移动设备的Web界面
+- **AJAX交互**：无刷新页面操作，提升用户体验
+- **安全机制**：支持HTTPS、密码策略、请求限制等安全特性
 
 ## 系统要求
 
@@ -152,11 +154,42 @@ GET /upgrade?imei={device_imei}&version={current_version}&project_key={project_k
 
 对于使用libfota2库的设备，可以直接使用升级接口。
 
-## 安全注意事项
+## 安全特性
+
+系统内置了多种安全机制，以保护固件升级过程和管理界面：
+
+1. **HTTPS支持**：可配置HTTPS证书路径，启用安全连接
+2. **密码策略**：可配置密码最小长度和复杂度要求
+3. **请求限制**：防止暴力破解和DoS攻击
+4. **CSRF保护**：防止跨站请求伪造攻击
+5. **固件验证**：支持固件签名验证（可选）
+6. **设备授权**：只有授权的设备才能获取更新
+
+### 安全配置
+
+在`config.py`中可以配置以下安全选项：
+
+```python
+# HTTPS配置
+ENABLE_HTTPS = True  # 是否启用HTTPS
+HTTPS_CERT_PATH = '/path/to/cert.pem'  # 证书路径
+HTTPS_KEY_PATH = '/path/to/key.pem'    # 密钥路径
+
+# 请求限制
+RATE_LIMIT_ENABLED = True  # 启用请求限制
+RATE_LIMIT_PER_MINUTE = 60  # 每分钟最大请求数
+
+# 密码安全策略
+PASSWORD_MIN_LENGTH = 8  # 密码最小长度
+PASSWORD_REQUIRE_SPECIAL = True  # 是否要求特殊字符
+```
+
+### 安全建议
 
 1. 生产环境中应修改默认管理员密码
 2. 建议启用HTTPS以保护数据传输安全
 3. 根据需要配置设备授权，防止未授权设备升级
+4. 定期更新系统和依赖库，修复已知安全漏洞
 
 ## 许可证
 
