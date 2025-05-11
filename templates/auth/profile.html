@@ -50,6 +50,11 @@
                             <div class="text-danger">{{ error }}</div>
                         {% endfor %}
                     </div>
+                    <div class="mb-3 form-check">
+                        {{ form.generate_anime_avatar(class="form-check-input") }}
+                        <label class="form-check-label" for="generate_anime_avatar">{{ _('生成新的动漫风格头像') }}</label>
+                        <div class="form-text">{{ _('使用AI为您生成一个新的动漫风格头像（如果同时上传了头像文件，则此选项无效）') }}</div>
+                    </div>
                     <hr>
                     <h5>{{ _('修改密码') }}</h5>
                     <div class="mb-3">

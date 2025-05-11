@@ -47,6 +47,11 @@
                             <div class="text-danger">{{ error }}</div>
                         {% endfor %}
                     </div>
+                    <div class="mb-3 form-check">
+                        {{ form.use_ai_avatar(class="form-check-input") }}
+                        <label class="form-check-label" for="use_ai_avatar">{{ _('使用AI生成动漫风格头像') }}</label>
+                        <div class="form-text">{{ _('自动为您生成一个独特的动漫风格头像') }}</div>
+                    </div>
                     <div class="d-grid gap-2">
                         {{ form.submit(class="btn btn-primary") }}
                     </div>
