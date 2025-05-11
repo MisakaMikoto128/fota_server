@@ -6,15 +6,15 @@ from datetime import datetime, timedelta
 from models import db, Device, Firmware, UpdateLog, Project, Role, User
 
 # 创建蓝图
-main_bp = Blueprint('main', __name__)
+pages_bp = Blueprint('pages', __name__)
 
-@main_bp.route('/')
+@pages_bp.route('/')
 def index():
     """首页"""
     return render_template('index.html')
 
 
-@main_bp.route('/dashboard')
+@pages_bp.route('/dashboard')
 @login_required
 def dashboard():
     """仪表盘页面"""
@@ -85,7 +85,7 @@ def dashboard():
                           project_activities=project_activities)
 
 
-@main_bp.route('/users')
+@pages_bp.route('/users')
 @login_required
 def user_list():
     """用户列表（仅管理员可见）"""
@@ -98,7 +98,7 @@ def user_list():
     return render_template('users/user_list.html', users=users, roles=roles)
 
 
-@main_bp.route('/users/set_role/<int:user_id>/<int:role_id>')
+@pages_bp.route('/users/set_role/<int:user_id>/<int:role_id>')
 @login_required
 def set_user_role(user_id, role_id):
     """设置用户角色（仅管理员可见）"""
@@ -111,16 +111,16 @@ def set_user_role(user_id, role_id):
     # 不能修改自己的角色
     if user.id == current_user.id:
         flash(_('不能修改自己的角色'), 'danger')
-        return redirect(url_for('main.user_list'))
+        return redirect(url_for('pages.user_list'))
 
     user.role_id = role.id
     db.session.commit()
 
     flash(_('用户 {} 的角色已更新为 {}').format(user.username, role.name), 'success')
-    return redirect(url_for('main.user_list'))
+    return redirect(url_for('pages.user_list'))
 
 
-@main_bp.route('/users/delete/<int:user_id>')
+@pages_bp.route('/users/delete/<int:user_id>')
 @login_required
 def delete_user(user_id):
     """删除用户（仅管理员可见）"""
@@ -132,10 +132,10 @@ def delete_user(user_id):
     # 不能删除自己
     if user.id == current_user.id:
         flash(_('不能删除自己'), 'danger')
-        return redirect(url_for('main.user_list'))
+        return redirect(url_for('pages.user_list'))
 
     db.session.delete(user)
     db.session.commit()
 
     flash(_('用户 {} 已删除').format(user.username), 'success')
-    return redirect(url_for('main.user_list'))
+    return redirect(url_for('pages.user_list'))

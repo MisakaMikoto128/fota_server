@@ -18,7 +18,7 @@
     <!-- 导航栏 -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('main.index') }}">
+            <a class="navbar-brand" href="{{ url_for('pages.index') }}">
                 <i class="bi bi-cloud-arrow-down me-2"></i>FOTA 服务器
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -28,7 +28,7 @@
                 <ul class="navbar-nav me-auto">
                     {% if current_user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.dashboard') }}">
+                        <a class="nav-link" href="{{ url_for('pages.dashboard') }}">
                             <i class="bi bi-speedometer2 me-1"></i>{{ _('仪表盘') }}
                         </a>
                     </li>
@@ -59,7 +59,7 @@
                     </li>
                     {% if current_user.is_administrator() %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.user_list') }}">
+                        <a class="nav-link" href="{{ url_for('pages.user_list') }}">
                             <i class="bi bi-people me-1"></i>{{ _('用户') }}
                         </a>
                     </li>

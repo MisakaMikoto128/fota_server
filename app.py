@@ -8,7 +8,7 @@ from models import db, User, Role
 from config import config
 import babel_support as babel_module
 from auth import auth_bp
-from main import main_bp
+from pages import pages_bp
 from projects import projects_bp
 from devices import devices_bp
 from firmware import firmware_bp
@@ -41,7 +41,7 @@ def create_app(config_name='default'):
 
     # 注册蓝图
     app.register_blueprint(auth_bp)
-    app.register_blueprint(main_bp)
+    app.register_blueprint(pages_bp)
     app.register_blueprint(projects_bp)
     app.register_blueprint(devices_bp)
     app.register_blueprint(firmware_bp)

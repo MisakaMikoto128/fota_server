@@ -16,7 +16,7 @@ auth_bp = Blueprint('auth', __name__)
 def login():
     """用户登录"""
     if current_user.is_authenticated:
-        return redirect(url_for('main.dashboard'))
+        return redirect(url_for('pages.dashboard'))
 
     form = LoginForm()
     if form.validate_on_submit():
@@ -33,7 +33,7 @@ def login():
 
             next_page = request.args.get('next')
             flash(_('登录成功！'), 'success')
-            return redirect(next_page or url_for('main.dashboard'))
+            return redirect(next_page or url_for('pages.dashboard'))
         else:
             flash(_('登录失败，请检查用户名和密码'), 'danger')
 
@@ -46,14 +46,14 @@ def logout():
     """用户退出"""
     logout_user()
     flash(_('您已成功退出登录'), 'info')
-    return redirect(url_for('main.index'))
+    return redirect(url_for('pages.index'))
 
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
     """用户注册"""
     if current_user.is_authenticated:
-        return redirect(url_for('main.dashboard'))
+        return redirect(url_for('pages.dashboard'))
 
     form = RegistrationForm()
     if form.validate_on_submit():
@@ -156,4 +156,4 @@ def set_language(lang):
             flash('Language switched to English', 'success')
         elif lang == 'ja':
             flash('言語が日本語に切り替わりました', 'success')
-    return redirect(request.referrer or url_for('main.index'))
+    return redirect(request.referrer or url_for('pages.index'))
