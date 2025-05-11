@@ -248,3 +248,29 @@ class UpdateLog(db.Model):
 
     def __repr__(self):
         return f'<UpdateLog {self.device.imei if self.device else "Unknown"} {self.from_version} -> {self.to_version}>'
+
+
+class RepoConfig(db.Model):
+    """仓库配置，用于系统更新"""
+    id = db.Column(db.Integer, primary_key=True)
+    repo_type = db.Column(db.String(20), default='github')  # github 或 gitee
+    repo_url = db.Column(db.String(255))
+    repo_branch = db.Column(db.String(100), default='main')
+    last_commit = db.Column(db.String(100))
+    last_check_time = db.Column(db.DateTime)
+    last_update_time = db.Column(db.DateTime)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    @staticmethod
+    def get_config():
+        """获取仓库配置，如果不存在则创建"""
+        config = RepoConfig.query.first()
+        if not config:
+            config = RepoConfig()
+            db.session.add(config)
+            db.session.commit()
+        return config
+
+    def __repr__(self):
+        return f'<RepoConfig {self.repo_type}:{self.repo_url}>'

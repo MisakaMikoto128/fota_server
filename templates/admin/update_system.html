@@ -1,0 +1,272 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ _('系统更新') }} - FOTA 固件升级服务器{% endblock %}
+
+{% block extra_css %}
+<style>
+    .update-status {
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+    .status-checking {
+        background-color: #f8f9fa;
+        border-left: 4px solid #6c757d;
+    }
+    .status-uptodate {
+        background-color: #d1e7dd;
+        border-left: 4px solid #198754;
+    }
+    .status-needupdate {
+        background-color: #fff3cd;
+        border-left: 4px solid #ffc107;
+    }
+    .status-updating {
+        background-color: #cfe2ff;
+        border-left: 4px solid #0d6efd;
+    }
+    .status-error {
+        background-color: #f8d7da;
+        border-left: 4px solid #dc3545;
+    }
+    .log-container {
+        background-color: #212529;
+        color: #f8f9fa;
+        padding: 15px;
+        border-radius: 5px;
+        font-family: monospace;
+        height: 300px;
+        overflow-y: auto;
+        margin-bottom: 20px;
+    }
+    .log-container pre {
+        color: #f8f9fa;
+        margin: 0;
+    }
+    .repo-info {
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-cloud-download me-2"></i>{{ _('系统更新') }}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                        {{ _('此页面允许管理员从Git仓库检查和更新系统。更新过程将拉取最新代码并重新启动服务。') }}
+                    </div>
+
+                    <!-- 仓库配置 -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="bi bi-gear me-2"></i>{{ _('仓库配置') }}</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="repoConfigForm" method="post" action="{{ url_for('pages.save_repo_config') }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                <div class="mb-3">
+                                    <label for="repoType" class="form-label">{{ _('仓库类型') }}</label>
+                                    <select class="form-select" id="repoType" name="repo_type">
+                                        <option value="github" {% if repo_config.repo_type == 'github' %}selected{% endif %}>GitHub</option>
+                                        <option value="gitee" {% if repo_config.repo_type == 'gitee' %}selected{% endif %}>Gitee</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="repoUrl" class="form-label">{{ _('仓库URL') }}</label>
+                                    <input type="text" class="form-control" id="repoUrl" name="repo_url" 
+                                           value="{{ repo_config.repo_url }}" placeholder="https://github.com/username/repo.git">
+                                    <div class="form-text">{{ _('例如：https://github.com/username/repo.git 或 https://gitee.com/username/repo.git') }}</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="repoBranch" class="form-label">{{ _('分支') }}</label>
+                                    <input type="text" class="form-control" id="repoBranch" name="repo_branch" 
+                                           value="{{ repo_config.repo_branch or 'main' }}" placeholder="main">
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-save me-1"></i>{{ _('保存配置') }}
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- 当前状态 -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>{{ _('当前状态') }}</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="repo-info">
+                                <p><strong>{{ _('仓库类型') }}:</strong> 
+                                    {% if repo_config.repo_type == 'github' %}
+                                        <i class="bi bi-github me-1"></i>GitHub
+                                    {% elif repo_config.repo_type == 'gitee' %}
+                                        <i class="bi bi-git me-1"></i>Gitee
+                                    {% else %}
+                                        {{ _('未配置') }}
+                                    {% endif %}
+                                </p>
+                                <p><strong>{{ _('仓库URL') }}:</strong> 
+                                    {% if repo_config.repo_url %}
+                                        <a href="{{ repo_config.repo_url }}" target="_blank">{{ repo_config.repo_url }}</a>
+                                    {% else %}
+                                        {{ _('未配置') }}
+                                    {% endif %}
+                                </p>
+                                <p><strong>{{ _('当前分支') }}:</strong> {{ repo_config.repo_branch or _('未配置') }}</p>
+                                <p><strong>{{ _('最后检查时间') }}:</strong> 
+                                    {% if repo_config.last_check_time %}
+                                        {{ repo_config.last_check_time.strftime('%Y-%m-%d %H:%M:%S') }}
+                                    {% else %}
+                                        {{ _('从未检查') }}
+                                    {% endif %}
+                                </p>
+                                <p><strong>{{ _('最后更新时间') }}:</strong> 
+                                    {% if repo_config.last_update_time %}
+                                        {{ repo_config.last_update_time.strftime('%Y-%m-%d %H:%M:%S') }}
+                                    {% else %}
+                                        {{ _('从未更新') }}
+                                    {% endif %}
+                                </p>
+                            </div>
+
+                            <div id="updateStatus" class="update-status status-checking">
+                                <h5><i class="bi bi-hourglass me-2"></i>{{ _('状态') }}</h5>
+                                <p id="statusMessage">{{ _('点击"检查更新"按钮以检查是否有可用更新。') }}</p>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button id="checkUpdateBtn" class="btn btn-primary">
+                                    <i class="bi bi-arrow-repeat me-1"></i>{{ _('检查更新') }}
+                                </button>
+                                <button id="updateSystemBtn" class="btn btn-warning" disabled>
+                                    <i class="bi bi-cloud-download me-1"></i>{{ _('更新系统') }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 更新日志 -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="bi bi-journal-text me-2"></i>{{ _('更新日志') }}</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="logContainer" class="log-container">
+                                <pre id="logContent">{{ _('等待操作...') }}</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        const updateStatus = $('#updateStatus');
+        const statusMessage = $('#statusMessage');
+        const logContent = $('#logContent');
+        const checkUpdateBtn = $('#checkUpdateBtn');
+        const updateSystemBtn = $('#updateSystemBtn');
+
+        // 检查更新
+        checkUpdateBtn.click(function() {
+            updateStatus.removeClass().addClass('update-status status-checking');
+            statusMessage.text('{{ _("正在检查更新...") }}');
+            logContent.text('{{ _("正在检查更新...") }}');
+            checkUpdateBtn.prop('disabled', true);
+            updateSystemBtn.prop('disabled', true);
+
+            $.ajax({
+                url: '{{ url_for("pages.check_update") }}',
+                type: 'POST',
+                data: {
+                    csrf_token: '{{ csrf_token }}'
+                },
+                success: function(response) {
+                    checkUpdateBtn.prop('disabled', false);
+                    
+                    if (response.status === 'uptodate') {
+                        updateStatus.removeClass().addClass('update-status status-uptodate');
+                        statusMessage.text('{{ _("系统已是最新版本") }}');
+                        updateSystemBtn.prop('disabled', true);
+                    } else if (response.status === 'needupdate') {
+                        updateStatus.removeClass().addClass('update-status status-needupdate');
+                        statusMessage.html('{{ _("发现新版本") }}: <strong>' + response.latest_commit + '</strong>');
+                        updateSystemBtn.prop('disabled', false);
+                    } else {
+                        updateStatus.removeClass().addClass('update-status status-error');
+                        statusMessage.text('{{ _("检查更新失败") }}');
+                        updateSystemBtn.prop('disabled', true);
+                    }
+                    
+                    logContent.text(response.log);
+                },
+                error: function(xhr) {
+                    checkUpdateBtn.prop('disabled', false);
+                    updateStatus.removeClass().addClass('update-status status-error');
+                    statusMessage.text('{{ _("检查更新失败") }}: ' + xhr.responseText);
+                    logContent.text('{{ _("错误") }}: ' + xhr.responseText);
+                }
+            });
+        });
+
+        // 更新系统
+        updateSystemBtn.click(function() {
+            if (!confirm('{{ _("确定要更新系统吗？此操作将重新启动服务器。") }}')) {
+                return;
+            }
+
+            updateStatus.removeClass().addClass('update-status status-updating');
+            statusMessage.text('{{ _("正在更新系统...") }}');
+            logContent.text('{{ _("正在更新系统...") }}');
+            checkUpdateBtn.prop('disabled', true);
+            updateSystemBtn.prop('disabled', true);
+
+            $.ajax({
+                url: '{{ url_for("pages.update_system") }}',
+                type: 'POST',
+                data: {
+                    csrf_token: '{{ csrf_token }}'
+                },
+                success: function(response) {
+                    checkUpdateBtn.prop('disabled', false);
+                    
+                    if (response.status === 'success') {
+                        updateStatus.removeClass().addClass('update-status status-uptodate');
+                        statusMessage.text('{{ _("系统已成功更新，服务器将在几秒钟后重新启动") }}');
+                        logContent.text(response.log);
+                        
+                        // 5秒后刷新页面
+                        setTimeout(function() {
+                            window.location.reload();
+                        }, 5000);
+                    } else {
+                        updateStatus.removeClass().addClass('update-status status-error');
+                        statusMessage.text('{{ _("更新系统失败") }}');
+                        updateSystemBtn.prop('disabled', false);
+                        logContent.text(response.log);
+                    }
+                },
+                error: function(xhr) {
+                    checkUpdateBtn.prop('disabled', false);
+                    updateStatus.removeClass().addClass('update-status status-error');
+                    statusMessage.text('{{ _("更新系统失败") }}: ' + xhr.responseText);
+                    updateSystemBtn.prop('disabled', false);
+                    logContent.text('{{ _("错误") }}: ' + xhr.responseText);
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

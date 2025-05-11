@@ -1,9 +1,15 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, abort
+from flask import Blueprint, render_template, redirect, url_for, flash, request, abort, jsonify
 from flask_login import login_required, current_user
 from flask_babel import gettext as _
 from datetime import datetime, timedelta
+import os
+import subprocess
+import logging
+import tempfile
+import shutil
 
-from models import db, Device, Firmware, UpdateLog, Project, Role, User
+from models import db, Device, Firmware, UpdateLog, Project, Role, User, RepoConfig
+from forms import RepoConfigForm
 
 # 创建蓝图
 pages_bp = Blueprint('pages', __name__)
@@ -145,3 +151,330 @@ def delete_user(user_id):
 
     flash(_('用户 {} 已删除').format(user.username), 'success')
     return redirect(url_for('pages.user_list'))
+
+
+@pages_bp.route('/admin/update_system')
+@login_required
+def update_system_page():
+    """系统更新页面（仅管理员可见）"""
+    if not current_user.is_administrator():
+        abort(403)
+
+    # 获取仓库配置
+    repo_config = RepoConfig.get_config()
+
+    return render_template('admin/update_system.html', repo_config=repo_config)
+
+
+@pages_bp.route('/admin/save_repo_config', methods=['POST'])
+@login_required
+def save_repo_config():
+    """保存仓库配置（仅管理员可见）"""
+    if not current_user.is_administrator():
+        abort(403)
+
+    # 获取仓库配置
+    repo_config = RepoConfig.get_config()
+
+    # 更新配置
+    repo_config.repo_type = request.form.get('repo_type', 'github')
+    repo_config.repo_url = request.form.get('repo_url', '')
+    repo_config.repo_branch = request.form.get('repo_branch', 'main')
+
+    db.session.commit()
+
+    flash(_('仓库配置已保存'), 'success')
+    return redirect(url_for('pages.update_system_page'))
+
+
+@pages_bp.route('/admin/check_update', methods=['POST'])
+@login_required
+def check_update():
+    """检查系统更新（仅管理员可见）"""
+    if not current_user.is_administrator():
+        return jsonify({'status': 'error', 'message': _('权限不足')}), 403
+
+    # 获取仓库配置
+    repo_config = RepoConfig.get_config()
+
+    if not repo_config.repo_url:
+        return jsonify({
+            'status': 'error',
+            'message': _('未配置仓库URL'),
+            'log': _('请先配置仓库URL')
+        })
+
+    # 创建临时目录
+    temp_dir = tempfile.mkdtemp()
+    log_output = []
+
+    try:
+        # 检查是否已经克隆过仓库
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        git_dir = os.path.join(current_dir, '.git')
+
+        if os.path.exists(git_dir):
+            # 已有Git仓库，获取当前提交
+            current_commit = subprocess.check_output(
+                ['git', 'rev-parse', 'HEAD'],
+                stderr=subprocess.STDOUT,
+                universal_newlines=True
+            ).strip()
+            log_output.append(f"当前提交: {current_commit}")
+
+            # 获取远程仓库URL
+            remote_url = subprocess.check_output(
+                ['git', 'config', '--get', 'remote.origin.url'],
+                stderr=subprocess.STDOUT,
+                universal_newlines=True
+            ).strip()
+            log_output.append(f"远程仓库: {remote_url}")
+
+            # 获取当前分支
+            current_branch = subprocess.check_output(
+                ['git', 'rev-parse', '--abbrev-ref', 'HEAD'],
+                stderr=subprocess.STDOUT,
+                universal_newlines=True
+            ).strip()
+            log_output.append(f"当前分支: {current_branch}")
+
+            # 获取远程更新
+            fetch_output = subprocess.check_output(
+                ['git', 'fetch', 'origin', repo_config.repo_branch],
+                stderr=subprocess.STDOUT,
+                universal_newlines=True
+            )
+            log_output.append(fetch_output)
+
+            # 检查是否有更新
+            diff_output = subprocess.check_output(
+                ['git', 'diff', f'HEAD..origin/{repo_config.repo_branch}', '--name-only'],
+                stderr=subprocess.STDOUT,
+                universal_newlines=True
+            )
+
+            if diff_output.strip():
+                # 有更新
+                log_output.append(_("发现以下文件有更新:"))
+                log_output.append(diff_output)
+
+                # 获取最新提交信息
+                latest_commit = subprocess.check_output(
+                    ['git', 'rev-parse', f'origin/{repo_config.repo_branch}'],
+                    stderr=subprocess.STDOUT,
+                    universal_newlines=True
+                ).strip()
+
+                # 获取提交日志
+                log_message = subprocess.check_output(
+                    ['git', 'log', '--oneline', f'HEAD..origin/{repo_config.repo_branch}'],
+                    stderr=subprocess.STDOUT,
+                    universal_newlines=True
+                )
+                log_output.append(_("提交历史:"))
+                log_output.append(log_message)
+
+                # 更新配置
+                repo_config.last_check_time = datetime.utcnow()
+                repo_config.last_commit = latest_commit
+                db.session.commit()
+
+                return jsonify({
+                    'status': 'needupdate',
+                    'message': _('发现新版本'),
+                    'latest_commit': latest_commit[:7],
+                    'log': '\n'.join(log_output)
+                })
+            else:
+                # 没有更新
+                log_output.append(_("系统已是最新版本"))
+
+                # 更新检查时间
+                repo_config.last_check_time = datetime.utcnow()
+                db.session.commit()
+
+                return jsonify({
+                    'status': 'uptodate',
+                    'message': _('系统已是最新版本'),
+                    'log': '\n'.join(log_output)
+                })
+        else:
+            # 没有Git仓库，需要克隆
+            log_output.append(_("未检测到Git仓库，需要克隆"))
+
+            # 克隆仓库到临时目录
+            clone_output = subprocess.check_output(
+                ['git', 'clone', '-b', repo_config.repo_branch, repo_config.repo_url, temp_dir],
+                stderr=subprocess.STDOUT,
+                universal_newlines=True
+            )
+            log_output.append(clone_output)
+
+            # 获取最新提交信息
+            os.chdir(temp_dir)
+            latest_commit = subprocess.check_output(
+                ['git', 'rev-parse', 'HEAD'],
+                stderr=subprocess.STDOUT,
+                universal_newlines=True
+            ).strip()
+
+            # 更新配置
+            repo_config.last_check_time = datetime.utcnow()
+            repo_config.last_commit = latest_commit
+            db.session.commit()
+
+            return jsonify({
+                'status': 'needupdate',
+                'message': _('需要初始化仓库'),
+                'latest_commit': latest_commit[:7],
+                'log': '\n'.join(log_output)
+            })
+
+    except subprocess.CalledProcessError as e:
+        log_output.append(f"错误: {e.output}")
+        return jsonify({
+            'status': 'error',
+            'message': _('检查更新失败'),
+            'log': '\n'.join(log_output)
+        })
+
+    finally:
+        # 清理临时目录
+        if os.path.exists(temp_dir):
+            shutil.rmtree(temp_dir)
+
+
+@pages_bp.route('/admin/update_system', methods=['POST'])
+@login_required
+def update_system():
+    """更新系统（仅管理员可见）"""
+    if not current_user.is_administrator():
+        return jsonify({'status': 'error', 'message': _('权限不足')}), 403
+
+    # 获取仓库配置
+    repo_config = RepoConfig.get_config()
+
+    if not repo_config.repo_url:
+        return jsonify({
+            'status': 'error',
+            'message': _('未配置仓库URL'),
+            'log': _('请先配置仓库URL')
+        })
+
+    log_output = []
+
+    try:
+        # 检查是否已经克隆过仓库
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        git_dir = os.path.join(current_dir, '.git')
+
+        if os.path.exists(git_dir):
+            # 已有Git仓库，拉取更新
+            log_output.append(_("正在拉取更新..."))
+
+            # 拉取更新
+            pull_output = subprocess.check_output(
+                ['git', 'pull', 'origin', repo_config.repo_branch],
+                stderr=subprocess.STDOUT,
+                universal_newlines=True
+            )
+            log_output.append(pull_output)
+
+            # 获取最新提交信息
+            latest_commit = subprocess.check_output(
+                ['git', 'rev-parse', 'HEAD'],
+                stderr=subprocess.STDOUT,
+                universal_newlines=True
+            ).strip()
+
+            # 更新配置
+            repo_config.last_update_time = datetime.utcnow()
+            repo_config.last_commit = latest_commit
+            db.session.commit()
+
+            # 重启服务器（这里只返回成功，实际重启需要在前端处理）
+            log_output.append(_("更新完成，准备重启服务器..."))
+
+            return jsonify({
+                'status': 'success',
+                'message': _('系统已更新，即将重启'),
+                'log': '\n'.join(log_output)
+            })
+        else:
+            # 没有Git仓库，需要初始化
+            log_output.append(_("未检测到Git仓库，需要初始化"))
+
+            # 创建临时目录
+            temp_dir = tempfile.mkdtemp()
+
+            try:
+                # 克隆仓库到临时目录
+                clone_output = subprocess.check_output(
+                    ['git', 'clone', '-b', repo_config.repo_branch, repo_config.repo_url, temp_dir],
+                    stderr=subprocess.STDOUT,
+                    universal_newlines=True
+                )
+                log_output.append(clone_output)
+
+                # 复制文件到当前目录
+                for item in os.listdir(temp_dir):
+                    if item != '.git':  # 不复制.git目录
+                        s = os.path.join(temp_dir, item)
+                        d = os.path.join(current_dir, item)
+                        if os.path.isdir(s):
+                            if os.path.exists(d):
+                                shutil.rmtree(d)
+                            shutil.copytree(s, d)
+                        else:
+                            shutil.copy2(s, d)
+
+                # 初始化Git仓库
+                os.chdir(current_dir)
+                init_output = subprocess.check_output(
+                    ['git', 'init'],
+                    stderr=subprocess.STDOUT,
+                    universal_newlines=True
+                )
+                log_output.append(init_output)
+
+                # 添加远程仓库
+                remote_output = subprocess.check_output(
+                    ['git', 'remote', 'add', 'origin', repo_config.repo_url],
+                    stderr=subprocess.STDOUT,
+                    universal_newlines=True
+                )
+                log_output.append(remote_output)
+
+                # 获取最新提交信息
+                latest_commit = subprocess.check_output(
+                    ['git', 'rev-parse', 'HEAD'],
+                    stderr=subprocess.STDOUT,
+                    universal_newlines=True
+                )
+
+                # 更新配置
+                repo_config.last_update_time = datetime.utcnow()
+                repo_config.last_commit = latest_commit.strip()
+                db.session.commit()
+
+                # 重启服务器（这里只返回成功，实际重启需要在前端处理）
+                log_output.append(_("初始化完成，准备重启服务器..."))
+
+                return jsonify({
+                    'status': 'success',
+                    'message': _('系统已初始化，即将重启'),
+                    'log': '\n'.join(log_output)
+                })
+
+            finally:
+                # 清理临时目录
+                if os.path.exists(temp_dir):
+                    shutil.rmtree(temp_dir)
+
+    except subprocess.CalledProcessError as e:
+        log_output.append(f"错误: {e.output}")
+        return jsonify({
+            'status': 'error',
+            'message': _('更新系统失败'),
+            'log': '\n'.join(log_output)
+        })

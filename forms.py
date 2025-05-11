@@ -156,3 +156,21 @@ class LanguageForm(FlaskForm):
         ('ja', _l('日文'))
     ])
     submit = SubmitField(_l('切换'))
+
+
+class RepoConfigForm(FlaskForm):
+    """仓库配置表单"""
+    repo_type = SelectField(_l('仓库类型'), choices=[
+        ('github', 'GitHub'),
+        ('gitee', 'Gitee')
+    ])
+    repo_url = StringField(_l('仓库URL'), validators=[
+        DataRequired(),
+        Regexp(r'^https?://(github\.com|gitee\.com)/[\w\-]+/[\w\-]+(.git)?$',
+               message=_l('请输入有效的GitHub或Gitee仓库URL'))
+    ])
+    repo_branch = StringField(_l('分支'), validators=[
+        DataRequired(),
+        Length(min=1, max=100)
+    ], default='main')
+    submit = SubmitField(_l('保存配置'))
