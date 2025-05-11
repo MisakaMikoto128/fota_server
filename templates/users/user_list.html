@@ -1,0 +1,123 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ _('用户管理') }} - FOTA 固件升级服务器{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-people me-2"></i>{{ _('用户管理') }}</h1>
+</div>
+
+<!-- 用户列表 -->
+{% if users %}
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>{{ _('用户名') }}</th>
+                        <th>{{ _('邮箱') }}</th>
+                        <th>{{ _('姓名') }}</th>
+                        <th>{{ _('角色') }}</th>
+                        <th>{{ _('最后登录') }}</th>
+                        <th>{{ _('创建时间') }}</th>
+                        <th>{{ _('操作') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="{{ url_for('static', filename='avatars/' + user.avatar) }}" alt="{{ user.username }}" class="rounded-circle me-2" style="width: 32px; height: 32px;">
+                                {{ user.username }}
+                                {% if user.is_administrator() %}
+                                <span class="badge bg-primary ms-2">{{ _('管理员') }}</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.name or '-' }}</td>
+                        <td>
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="roleDropdown{{ user.id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                    {{ user.role.name }}
+                                </button>
+                                {% if user.id != current_user.id %}
+                                <ul class="dropdown-menu" aria-labelledby="roleDropdown{{ user.id }}">
+                                    {% for role in roles %}
+                                    <li><a class="dropdown-item {% if user.role_id == role.id %}active{% endif %}" href="{{ url_for('main.set_user_role', user_id=user.id, role_id=role.id) }}">
+                                        {{ role.name }}
+                                    </a></li>
+                                    {% endfor %}
+                                </ul>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td>{{ user.last_login.strftime('%Y-%m-%d %H:%M') if user.last_login else '-' }}</td>
+                        <td>{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+                        <td>
+                            {% if user.id != current_user.id %}
+                            <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteUserModal" 
+                                    data-user-id="{{ user.id }}" data-user-name="{{ user.username }}">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="card shadow-sm">
+    <div class="card-body text-center py-5">
+        <i class="bi bi-people text-muted" style="font-size: 4rem;"></i>
+        <h4 class="mt-3 text-muted">{{ _('暂无用户') }}</h4>
+    </div>
+</div>
+{% endif %}
+
+<!-- 删除用户确认模态框 -->
+<div class="modal fade" id="deleteUserModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="bi bi-exclamation-triangle me-2"></i>{{ _('删除确认') }}</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>{{ _('您确定要删除用户') }} <span id="deleteUserName" class="fw-bold"></span> {{ _('吗？') }}</p>
+                <p class="text-danger">{{ _('此操作不可逆，删除后将无法恢复。用户创建的所有项目和上传的固件将保留。') }}</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('取消') }}</button>
+                <a href="#" id="confirmDeleteUser" class="btn btn-danger">
+                    <i class="bi bi-trash me-2"></i>{{ _('确认删除') }}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 删除用户确认模态框
+    const deleteUserModal = document.getElementById('deleteUserModal');
+    if (deleteUserModal) {
+        deleteUserModal.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            const userId = button.getAttribute('data-user-id');
+            const userName = button.getAttribute('data-user-name');
+            
+            document.getElementById('deleteUserName').textContent = userName;
+            document.getElementById('confirmDeleteUser').href = "{{ url_for('main.delete_user', user_id=0) }}".replace('0', userId);
+        });
+    }
+});
+</script>
+{% endblock %}

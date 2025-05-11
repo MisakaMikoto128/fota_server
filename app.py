@@ -6,7 +6,7 @@ from datetime import datetime
 
 from models import db, User, Role
 from config import config
-import babel as babel_module
+import babel_support as babel_module
 from auth import auth_bp
 from main import main_bp
 from projects import projects_bp

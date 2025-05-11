@@ -1,0 +1,250 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ _('升级规则') }} - FOTA 固件升级服务器{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-arrow-up-right-circle me-2"></i>{{ _('升级规则') }}</h1>
+    <div>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addRuleModal">
+            <i class="bi bi-plus-circle me-2"></i>{{ _('添加规则') }}
+        </button>
+    </div>
+</div>
+
+<!-- 筛选器 -->
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <form method="GET" action="{{ url_for('rules.update_rules') }}" class="row g-3">
+            <div class="col-md-4">
+                <label for="version" class="form-label">{{ _('版本号') }}</label>
+                <input type="text" class="form-control" id="version" name="version" value="{{ request.args.get('version', '') }}">
+            </div>
+            <div class="col-md-4">
+                <label for="project_id" class="form-label">{{ _('项目') }}</label>
+                <select class="form-select" id="project_id" name="project_id">
+                    <option value="">{{ _('全部项目') }}</option>
+                    {% for project in projects %}
+                    <option value="{{ project.id }}" {% if current_project_id == project.id %}selected{% endif %}>{{ project.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary me-2">
+                    <i class="bi bi-search me-1"></i>{{ _('搜索') }}
+                </button>
+                <a href="{{ url_for('rules.update_rules') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-x-circle me-1"></i>{{ _('重置') }}
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 规则列表 -->
+{% if rules %}
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>{{ _('起始版本') }}</th>
+                        <th>{{ _('目标版本') }}</th>
+                        <th>{{ _('固件') }}</th>
+                        <th>{{ _('项目') }}</th>
+                        <th>{{ _('创建时间') }}</th>
+                        <th>{{ _('状态') }}</th>
+                        <th>{{ _('操作') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for rule in rules %}
+                    <tr>
+                        <td>{{ rule.from_version }}</td>
+                        <td>{{ rule.to_version }}</td>
+                        <td>
+                            {% if rule.firmware %}
+                            <a href="{{ url_for('firmware.download_firmware', firmware_id=rule.firmware.id) }}">{{ rule.firmware.version }}</a>
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        <td>{{ rule.project.name if rule.project else '-' }}</td>
+                        <td>{{ rule.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>
+                            {% if rule.is_active %}
+                            <span class="badge bg-success">{{ _('启用') }}</span>
+                            {% else %}
+                            <span class="badge bg-danger">{{ _('禁用') }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="{{ url_for('rules.toggle_rule', rule_id=rule.id) }}" class="btn btn-sm btn-outline-warning">
+                                    {% if rule.is_active %}
+                                    <i class="bi bi-toggle-on"></i>
+                                    {% else %}
+                                    <i class="bi bi-toggle-off"></i>
+                                    {% endif %}
+                                </a>
+                                <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteRuleModal" 
+                                        data-rule-id="{{ rule.id }}" data-rule-from="{{ rule.from_version }}" data-rule-to="{{ rule.to_version }}">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="card shadow-sm">
+    <div class="card-body text-center py-5">
+        <i class="bi bi-diagram-3 text-muted" style="font-size: 4rem;"></i>
+        <h4 class="mt-3 text-muted">{{ _('暂无升级规则') }}</h4>
+        <p class="text-muted">{{ _('点击上方的"添加规则"按钮创建您的第一个升级规则') }}</p>
+        <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#addRuleModal">
+            <i class="bi bi-plus-circle me-2"></i>{{ _('添加规则') }}
+        </button>
+    </div>
+</div>
+{% endif %}
+
+<!-- 添加规则模态框 -->
+<div class="modal fade" id="addRuleModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>{{ _('添加升级规则') }}</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('rules.add_rule') }}">
+                {{ form.hidden_tag() }}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="project_id" class="form-label">{{ _('所属项目') }} <span class="text-danger">*</span></label>
+                        {{ form.project_id(class="form-select", id="project_select") }}
+                        {% for error in form.project_id.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="mb-3">
+                        <label for="from_version" class="form-label">{{ _('起始版本') }} <span class="text-danger">*</span></label>
+                        {{ form.from_version(class="form-control", placeholder="001.000.001") }}
+                        <div class="form-text">{{ _('设备当前版本') }}</div>
+                        {% for error in form.from_version.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="mb-3">
+                        <label for="to_version" class="form-label">{{ _('目标版本') }} <span class="text-danger">*</span></label>
+                        {{ form.to_version(class="form-control", placeholder="001.000.002") }}
+                        <div class="form-text">{{ _('升级后的版本') }}</div>
+                        {% for error in form.to_version.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="mb-3">
+                        <label for="firmware_id" class="form-label">{{ _('固件') }} <span class="text-danger">*</span></label>
+                        {{ form.firmware_id(class="form-select", id="firmware_select") }}
+                        {% for error in form.firmware_id.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="mb-3 form-check">
+                        {{ form.is_active(class="form-check-input") }}
+                        <label class="form-check-label" for="is_active">{{ _('启用规则') }}</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('取消') }}</button>
+                    {{ form.submit(class="btn btn-primary") }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 删除规则确认模态框 -->
+<div class="modal fade" id="deleteRuleModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="bi bi-exclamation-triangle me-2"></i>{{ _('删除确认') }}</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>{{ _('您确定要删除从') }} <span id="deleteRuleFrom" class="fw-bold"></span> {{ _('到') }} <span id="deleteRuleTo" class="fw-bold"></span> {{ _('的升级规则吗？') }}</p>
+                <p class="text-danger">{{ _('此操作不可逆，删除后将无法恢复。') }}</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('取消') }}</button>
+                <a href="#" id="confirmDeleteRule" class="btn btn-danger">
+                    <i class="bi bi-trash me-2"></i>{{ _('确认删除') }}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 删除规则确认模态框
+    const deleteRuleModal = document.getElementById('deleteRuleModal');
+    if (deleteRuleModal) {
+        deleteRuleModal.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            const ruleId = button.getAttribute('data-rule-id');
+            const ruleFrom = button.getAttribute('data-rule-from');
+            const ruleTo = button.getAttribute('data-rule-to');
+            
+            document.getElementById('deleteRuleFrom').textContent = ruleFrom;
+            document.getElementById('deleteRuleTo').textContent = ruleTo;
+            document.getElementById('confirmDeleteRule').href = "{{ url_for('rules.delete_rule', rule_id=0) }}".replace('0', ruleId);
+        });
+    }
+    
+    // 项目选择变化时更新固件列表
+    const projectSelect = document.getElementById('project_select');
+    const firmwareSelect = document.getElementById('firmware_select');
+    
+    if (projectSelect && firmwareSelect) {
+        projectSelect.addEventListener('change', function() {
+            const projectId = this.value;
+            
+            // 清空固件选择
+            firmwareSelect.innerHTML = '';
+            
+            if (projectId) {
+                // 获取项目的固件列表
+                fetch(`/update_rules/get_firmwares/${projectId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            alert(data.error);
+                            return;
+                        }
+                        
+                        // 添加固件选项
+                        data.firmwares.forEach(firmware => {
+                            const option = document.createElement('option');
+                            option.value = firmware.id;
+                            option.textContent = firmware.version;
+                            firmwareSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error fetching firmwares:', error);
+                    });
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
