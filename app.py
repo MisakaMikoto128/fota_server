@@ -1,5 +1,6 @@
 from flask import Flask, request, session, g, render_template
 from flask_login import LoginManager, current_user
+from flask_wtf.csrf import CSRFProtect
 import os
 import logging
 from datetime import datetime
@@ -25,6 +26,10 @@ def create_app(config_name='default'):
 
     # 初始化数据库
     db.init_app(app)
+
+    # 初始化CSRF保护
+    csrf = CSRFProtect()
+    csrf.init_app(app)
 
     # 初始化登录管理器
     login_manager = LoginManager()

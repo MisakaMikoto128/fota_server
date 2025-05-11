@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const userName = button.getAttribute('data-user-name');
             
             document.getElementById('deleteUserName').textContent = userName;
-            document.getElementById('confirmDeleteUser').href = "{{ url_for('main.delete_user', user_id=0) }}".replace('0', userId);
+            document.getElementById('confirmDeleteUser').href = "{{ url_for('pages.delete_user', user_id=0) }}".replace('0', userId);
         });
     }
 });

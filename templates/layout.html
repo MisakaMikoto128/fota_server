@@ -13,6 +13,8 @@
     <!-- 自定义样式 -->
     <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
     {% block extra_css %}{% endblock %}
+    <!-- CSRF令牌 -->
+    <meta name="csrf-token" content="{{ csrf_token }}">
 </head>
 <body>
     <!-- 导航栏 -->

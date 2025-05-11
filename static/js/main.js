@@ -1,3 +1,8 @@
+// 获取CSRF令牌
+function getCsrfToken() {
+    return document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+}
+
 // 页面加载完成后执行
 document.addEventListener('DOMContentLoaded', function() {
     // 自动关闭警告消息
@@ -29,19 +34,19 @@ document.addEventListener('DOMContentLoaded', function() {
             header.addEventListener('click', function() {
                 const sortKey = this.dataset.sort;
                 const sortDirection = this.classList.contains('sort-asc') ? 'desc' : 'asc';
-                
+
                 // 清除所有排序状态
                 headers.forEach(h => {
                     h.classList.remove('sort-asc', 'sort-desc');
                     h.querySelector('.sort-icon')?.remove();
                 });
-                
+
                 // 设置当前排序状态
                 this.classList.add(`sort-${sortDirection}`);
                 const icon = document.createElement('span');
                 icon.className = `sort-icon bi bi-arrow-${sortDirection === 'asc' ? 'up' : 'down'} ms-1`;
                 this.appendChild(icon);
-                
+
                 // 执行排序
                 sortTable(table, sortKey, sortDirection);
             });
@@ -64,10 +69,10 @@ document.addEventListener('DOMContentLoaded', function() {
         input.addEventListener('blur', function() {
             const value = this.value.trim();
             const isValid = /^\d{3}\.\d{3}\.\d{3}$/.test(value);
-            
+
             if (value && !isValid) {
                 this.classList.add('is-invalid');
-                
+
                 // 添加错误提示
                 let feedback = this.nextElementSibling;
                 if (!feedback || !feedback.classList.contains('invalid-feedback')) {
@@ -88,10 +93,10 @@ document.addEventListener('DOMContentLoaded', function() {
         input.addEventListener('blur', function() {
             const value = this.value.trim();
             const isValid = /^\d{15}$/.test(value);
-            
+
             if (value && !isValid) {
                 this.classList.add('is-invalid');
-                
+
                 // 添加错误提示
                 let feedback = this.nextElementSibling;
                 if (!feedback || !feedback.classList.contains('invalid-feedback')) {
@@ -111,32 +116,32 @@ document.addEventListener('DOMContentLoaded', function() {
 function sortTable(table, key, direction) {
     const tbody = table.querySelector('tbody');
     const rows = Array.from(tbody.querySelectorAll('tr'));
-    
+
     // 排序行
     rows.sort((a, b) => {
-        const aValue = a.querySelector(`td[data-sort-value="${key}"]`)?.dataset.sortValue || 
+        const aValue = a.querySelector(`td[data-sort-value="${key}"]`)?.dataset.sortValue ||
                       a.querySelector(`td:nth-child(${parseInt(key) + 1})`)?.textContent.trim();
-        const bValue = b.querySelector(`td[data-sort-value="${key}"]`)?.dataset.sortValue || 
+        const bValue = b.querySelector(`td[data-sort-value="${key}"]`)?.dataset.sortValue ||
                       b.querySelector(`td:nth-child(${parseInt(key) + 1})`)?.textContent.trim();
-        
+
         // 数字排序
         if (!isNaN(aValue) && !isNaN(bValue)) {
             return direction === 'asc' ? aValue - bValue : bValue - aValue;
         }
-        
+
         // 日期排序
         const aDate = new Date(aValue);
         const bDate = new Date(bValue);
         if (!isNaN(aDate) && !isNaN(bDate)) {
             return direction === 'asc' ? aDate - bDate : bDate - aDate;
         }
-        
+
         // 字符串排序
-        return direction === 'asc' ? 
-            aValue.localeCompare(bValue, 'zh-CN') : 
+        return direction === 'asc' ?
+            aValue.localeCompare(bValue, 'zh-CN') :
             bValue.localeCompare(aValue, 'zh-CN');
     });
-    
+
     // 重新添加排序后的行
     rows.forEach(row => tbody.appendChild(row));
 }
@@ -144,11 +149,11 @@ function sortTable(table, key, direction) {
 // 格式化文件大小
 function formatFileSize(bytes) {
     if (bytes === 0) return '0 Bytes';
-    
+
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    
+
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
@@ -156,11 +161,11 @@ function formatFileSize(bytes) {
 function compareVersions(v1, v2) {
     const parts1 = v1.split('.').map(Number);
     const parts2 = v2.split('.').map(Number);
-    
+
     for (let i = 0; i < parts1.length; i++) {
         if (parts1[i] > parts2[i]) return 1;
         if (parts1[i] < parts2[i]) return -1;
     }
-    
+
     return 0;
 }
