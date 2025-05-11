@@ -109,7 +109,9 @@
             </div>
             <div class="card-body">
                 {% if version_distribution %}
-                <canvas id="versionChart" height="250"></canvas>
+                <div class="chart-container" style="position: relative; height: 250px; width: 100%; overflow: hidden;">
+                    <canvas id="versionChart"></canvas>
+                </div>
                 {% else %}
                 <div class="text-center py-5">
                     <i class="bi bi-bar-chart text-muted" style="font-size: 3rem;"></i>
@@ -225,36 +227,139 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // 添加窗口大小调整事件监听器
+    function handleResize() {
+        if (window.versionChartInstance) {
+            window.versionChartInstance.resize();
+        }
+    }
+
+    window.addEventListener('resize', handleResize);
     // 版本分布图表
     {% if version_distribution %}
     var versionData = {{ version_distribution|tojson }};
-    var labels = Object.keys(versionData);
-    var data = Object.values(versionData);
+
+    // 处理标签和数据，确保没有undefined
+    var labels = [];
+    var data = [];
+    var colors = [
+        '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b',
+        '#5a5c69', '#6f42c1', '#20c9a6', '#fd7e14', '#6610f2'
+    ];
+
+    // 将数据转换为数组格式，便于排序
+    var dataArray = Object.entries(versionData).map(function(entry) {
+        return {
+            version: entry[0],
+            count: entry[1]
+        };
+    });
+
+    // 按设备数量降序排序
+    dataArray.sort(function(a, b) {
+        return b.count - a.count;
+    });
+
+    // 提取排序后的标签和数据
+    dataArray.forEach(function(item) {
+        // 确保版本号不是"undefined"
+        let version = item.version;
+        if (version === "undefined") {
+            version = "未知版本";
+        }
+        labels.push(version);
+        data.push(item.count);
+    });
+
+    // 调试信息
+    console.log("版本标签:", labels);
+    console.log("版本数据:", data);
+
+    // 确保图表容器尺寸合理
+    var chartContainer = document.querySelector('#versionChart').parentElement;
+    if (chartContainer) {
+        chartContainer.style.height = '250px';
+    }
 
     var ctx = document.getElementById('versionChart').getContext('2d');
-    var versionChart = new Chart(ctx, {
-        type: 'pie',
+
+    // 销毁已存在的图表实例（如果有）
+    if (window.versionChartInstance) {
+        window.versionChartInstance.destroy();
+    }
+
+    // 创建新的图表实例
+    window.versionChartInstance = new Chart(ctx, {
+        type: 'doughnut', // 使用环形图而不是饼图
         data: {
             labels: labels,
             datasets: [{
                 data: data,
-                backgroundColor: [
-                    '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b',
-                    '#5a5c69', '#6f42c1', '#20c9a6', '#fd7e14', '#6610f2'
-                ],
-                borderWidth: 1
+                backgroundColor: colors,
+                borderWidth: 1,
+                borderColor: '#ffffff',
+                hoverOffset: 4
             }]
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false,
+            maintainAspectRatio: true,
+            aspectRatio: 1.5,  // 控制宽高比，使图表更紧凑
+            cutout: '60%',     // 环形图中间空白的大小
             plugins: {
                 legend: {
-                    position: 'right'
+                    position: 'right',
+                    align: 'center',
+                    labels: {
+                        boxWidth: 10,
+                        padding: 10,
+                        font: {
+                            size: 11  // 减小字体大小
+                        },
+                        generateLabels: function(chart) {
+                            // 使用原始标签数据
+                            const original = Chart.defaults.plugins.legend.labels.generateLabels(chart);
+                            for (let i = 0; i < original.length; i++) {
+                                // 使用我们之前定义的标签数组中的值
+                                if (i < labels.length) {
+                                    original[i].text = labels[i];
+
+                                    // 限制长度
+                                    if (original[i].text && original[i].text.length > 15) {
+                                        original[i].text = original[i].text.substring(0, 12) + '...';
+                                    }
+                                }
+                            }
+                            return original;
+                        }
+                    }
+                },
+                tooltip: {
+                    enabled: true,
+                    callbacks: {
+                        label: function(context) {
+                            // 使用索引从我们的标签数组中获取正确的标签
+                            let label = labels[context.dataIndex] || '未知版本';
+                            let value = context.raw || 0;
+                            let total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                            let percentage = Math.round((value / total) * 100);
+                            return `${label}: ${value} 台设备 (${percentage}%)`;
+                        }
+                    }
                 }
+            },
+            layout: {
+                padding: 0
+            },
+            animation: {
+                animateRotate: true,
+                animateScale: false
             }
         }
     });
+
+    // 使用新的响应式图表处理函数
+    setupChartResponsiveness(window.versionChartInstance, 'versionChart');
     {% endif %}
 });
 </script>

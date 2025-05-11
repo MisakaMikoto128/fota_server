@@ -97,11 +97,11 @@ body {
     .card-body {
         padding: 1rem;
     }
-    
+
     .table {
         font-size: 0.875rem;
     }
-    
+
     .btn-group-sm > .btn {
         padding: 0.25rem 0.5rem;
         font-size: 0.75rem;
@@ -171,4 +171,25 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
     background: #a8a8a8;
+}
+
+/* 图表容器样式 */
+.chart-container {
+    position: relative;
+    margin: auto;
+    height: 250px;
+    max-height: 250px;
+    overflow: hidden;
+}
+
+.chart-container canvas {
+    max-height: 100%;
+    max-width: 100%;
+}
+
+/* 确保图表在小屏幕上正确显示 */
+@media (max-width: 768px) {
+    .chart-container {
+        height: 200px;
+    }
 }

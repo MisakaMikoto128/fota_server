@@ -62,11 +62,34 @@ def dashboard():
     # 版本分布
     version_distribution = {}
     for device in Device.query.filter(Device.project_id.in_(project_ids) if project_ids else False).all():
-        if device.current_version:
-            if device.current_version in version_distribution:
-                version_distribution[device.current_version] += 1
+        # 确保版本号有效，避免 undefined 或 null
+        version = device.current_version
+        if version and version.strip():  # 确保版本号不为空且不只包含空格
+            # 尝试格式化版本号为标准格式 (xxx.yyy.zzz)
+            try:
+                # 如果版本号是数字格式，尝试转换为标准格式
+                if '.' in version:
+                    parts = version.split('.')
+                    if len(parts) == 3:
+                        # 确保每部分都是3位数字
+                        formatted_version = '.'.join([part.zfill(3) for part in parts])
+                        version = formatted_version
+            except:
+                # 如果格式化失败，使用原始版本号
+                pass
+
+            # 添加到分布统计
+            if version in version_distribution:
+                version_distribution[version] += 1
             else:
-                version_distribution[device.current_version] = 1
+                version_distribution[version] = 1
+        else:
+            # 对于没有版本号的设备，归类为"未知版本"
+            unknown_key = _('未知版本')
+            if unknown_key in version_distribution:
+                version_distribution[unknown_key] += 1
+            else:
+                version_distribution[unknown_key] = 1
 
     # 项目活动
     project_activities = []

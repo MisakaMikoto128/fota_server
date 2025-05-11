@@ -169,3 +169,45 @@ function compareVersions(v1, v2) {
 
     return 0;
 }
+
+// 图表处理函数
+function setupChartResponsiveness(chartInstance, chartId) {
+    if (!chartInstance || !chartId) return;
+
+    // 获取图表容器
+    const canvas = document.getElementById(chartId);
+    if (!canvas) return;
+
+    // 立即调整大小
+    function resizeChart() {
+        if (chartInstance) {
+            // 确保图表不会超出容器
+            const parentHeight = canvas.parentElement.clientHeight;
+
+            // 设置最大尺寸
+            canvas.style.maxWidth = '100%';
+            canvas.style.maxHeight = parentHeight + 'px';
+
+            // 重新渲染图表
+            chartInstance.resize();
+        }
+    }
+
+    // 初始调整
+    resizeChart();
+
+    // 设置观察器监听容器大小变化
+    if (window.ResizeObserver) {
+        const resizeObserver = new ResizeObserver(() => {
+            resizeChart();
+        });
+
+        // 观察canvas的父元素
+        if (canvas.parentElement) {
+            resizeObserver.observe(canvas.parentElement);
+        }
+    }
+
+    // 添加窗口大小变化监听
+    window.addEventListener('resize', resizeChart);
+}
