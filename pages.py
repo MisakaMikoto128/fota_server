@@ -9,7 +9,8 @@ import tempfile
 import shutil
 
 from models import db, Device, Firmware, UpdateLog, Project, Role, User, RepoConfig
-from forms import RepoConfigForm
+from forms import RepoConfigForm, AdminUserCreateForm
+from avatar_generator import generate_random_avatar
 
 # 创建蓝图
 pages_bp = Blueprint('pages', __name__)
@@ -106,8 +107,68 @@ def user_list():
 
     users = User.query.all()
     roles = Role.query.all()
+    config = RepoConfig.get_config()
 
-    return render_template('users/user_list.html', users=users, roles=roles)
+    return render_template('users/user_list.html',
+                          users=users,
+                          roles=roles,
+                          allow_registration=config.allow_registration)
+
+
+@pages_bp.route('/users/toggle_registration')
+@login_required
+def toggle_registration():
+    """切换是否允许用户自行注册（仅管理员可见）"""
+    if not current_user.is_administrator():
+        abort(403)
+
+    config = RepoConfig.get_config()
+    config.allow_registration = not config.allow_registration
+    db.session.commit()
+
+    status = _('开启') if config.allow_registration else _('关闭')
+    flash(_('用户注册功能已{}').format(status), 'success')
+    return redirect(url_for('pages.user_list'))
+
+
+@pages_bp.route('/users/create', methods=['GET', 'POST'])
+@login_required
+def create_user():
+    """管理员创建用户（仅管理员可见）"""
+    if not current_user.is_administrator():
+        abort(403)
+
+    form = AdminUserCreateForm()
+    # 设置角色选择项
+    form.role.choices = [(role.id, role.name) for role in Role.query.all()]
+
+    if form.validate_on_submit():
+        user = User(
+            username=form.username.data,
+            email=form.email.data,
+            name=form.name.data,
+            role_id=form.role.data
+        )
+        user.set_password(form.password.data)
+
+        # 如果选择使用AI生成动漫头像
+        if form.use_ai_avatar.data:
+            # 确保头像目录存在
+            avatar_dir = os.path.join(os.path.dirname(__file__), 'static/avatars')
+            if not os.path.exists(avatar_dir):
+                os.makedirs(avatar_dir)
+
+            # 生成动漫头像
+            avatar_filename = generate_random_avatar(form.username.data, avatar_dir)
+            user.avatar = avatar_filename
+
+        db.session.add(user)
+        db.session.commit()
+
+        flash(_('用户 {} 创建成功').format(user.username), 'success')
+        return redirect(url_for('pages.user_list'))
+
+    return render_template('users/create_user.html', form=form)
 
 
 @pages_bp.route('/users/set_role/<int:user_id>/<int:role_id>')

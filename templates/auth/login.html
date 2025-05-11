@@ -36,7 +36,11 @@
                 </form>
             </div>
             <div class="card-footer text-center">
+                {% if allow_registration %}
                 <p class="mb-0">{{ _('还没有账号？') }} <a href="{{ url_for('auth.register') }}">{{ _('立即注册') }}</a></p>
+                {% else %}
+                <p class="mb-0 text-muted">{{ _('管理员已关闭用户注册功能') }}</p>
+                {% endif %}
             </div>
         </div>
     </div>

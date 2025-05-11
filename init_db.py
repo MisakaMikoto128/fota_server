@@ -15,19 +15,20 @@ def init_database():
     # 创建应用
     app = Flask(__name__)
     app.config.from_object(config['development'])
-    
+
     # 初始化数据库
     db.init_app(app)
-    
+
     with app.app_context():
-        # 创建所有表
+        # 删除所有表并重新创建
+        db.drop_all()
         db.create_all()
-        
+        print("已重新创建所有数据库表")
+
         # 初始化角色
-        if not Role.query.first():
-            Role.insert_roles()
-            print("已初始化角色")
-        
+        Role.insert_roles()
+        print("已初始化角色")
+
         # 创建管理员账户
         if not User.query.filter_by(username='admin').first():
             admin = User(
@@ -40,7 +41,7 @@ def init_database():
             db.session.add(admin)
             db.session.commit()
             print("已创建默认管理员账户")
-        
+
         # 创建默认项目
         if not Project.query.first():
             default_project = Project(
@@ -50,14 +51,14 @@ def init_database():
                 created_by_id=User.query.filter_by(username='admin').first().id
             )
             db.session.add(default_project)
-            
+
             # 将管理员添加到默认项目
             admin_user = User.query.filter_by(username='admin').first()
             default_project.users.append(admin_user)
-            
+
             db.session.commit()
             print("已创建默认项目")
-        
+
         print("数据库初始化完成")
 
 if __name__ == '__main__':
@@ -65,7 +66,7 @@ if __name__ == '__main__':
     force = False
     if len(sys.argv) > 1 and sys.argv[1] == '--force':
         force = True
-    
+
     # 检查数据库文件是否存在
     db_file = 'fota.db'
     if os.path.exists(db_file) and not force:
@@ -74,10 +75,10 @@ if __name__ == '__main__':
         if response.lower() != 'y':
             print("操作已取消")
             sys.exit(0)
-        
+
         # 删除现有数据库文件
         os.remove(db_file)
         print(f"已删除现有数据库文件 {db_file}")
-    
+
     # 初始化数据库
     init_database()

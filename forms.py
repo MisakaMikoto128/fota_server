@@ -174,3 +174,33 @@ class RepoConfigForm(FlaskForm):
         Length(min=1, max=100)
     ], default='main')
     submit = SubmitField(_l('保存配置'))
+
+
+class AdminUserCreateForm(FlaskForm):
+    """管理员创建用户表单"""
+    username = StringField(_l('用户名'), validators=[
+        DataRequired(),
+        Length(min=3, max=20)
+    ])
+    email = StringField(_l('电子邮箱'), validators=[
+        DataRequired(),
+        Email(message=_l('请输入有效的电子邮箱地址'))
+    ])
+    password = PasswordField(_l('密码'), validators=[
+        DataRequired(),
+        Length(min=6, message=_l('密码长度至少为6个字符'))
+    ])
+    name = StringField(_l('姓名'), validators=[Optional(), Length(max=64)])
+    role = SelectField(_l('角色'), coerce=int, validators=[DataRequired()])
+    use_ai_avatar = BooleanField(_l('使用AI生成动漫头像'), default=True)
+    submit = SubmitField(_l('创建用户'))
+
+    def validate_username(self, field):
+        """验证用户名是否已存在"""
+        if User.query.filter_by(username=field.data).first():
+            raise ValidationError(_l('该用户名已被使用'))
+
+    def validate_email(self, field):
+        """验证邮箱是否已存在"""
+        if User.query.filter_by(email=field.data).first():
+            raise ValidationError(_l('该邮箱已被注册'))

@@ -261,6 +261,7 @@ class RepoConfig(db.Model):
     last_update_time = db.Column(db.DateTime)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    allow_registration = db.Column(db.Boolean, default=True)  # 是否允许用户自行注册
 
     @staticmethod
     def get_config():

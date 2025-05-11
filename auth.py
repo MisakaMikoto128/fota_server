@@ -1,11 +1,11 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, session
+from flask import Blueprint, render_template, redirect, url_for, flash, request, session, abort
 from flask_login import login_user, logout_user, login_required, current_user
 from flask_babel import gettext as _
 from werkzeug.utils import secure_filename
 import os
 from datetime import datetime
 
-from models import db, User, Role
+from models import db, User, Role, RepoConfig
 from forms import LoginForm, RegistrationForm, UserProfileForm
 from avatar_generator import generate_random_avatar
 
@@ -37,7 +37,11 @@ def login():
         else:
             flash(_('登录失败，请检查用户名和密码'), 'danger')
 
-    return render_template('auth/login.html', form=form)
+    # 获取注册开关状态
+    config = RepoConfig.get_config()
+    allow_registration = config.allow_registration
+
+    return render_template('auth/login.html', form=form, allow_registration=allow_registration)
 
 
 @auth_bp.route('/logout')
@@ -54,6 +58,12 @@ def register():
     """用户注册"""
     if current_user.is_authenticated:
         return redirect(url_for('pages.dashboard'))
+
+    # 检查是否允许用户自行注册
+    config = RepoConfig.get_config()
+    if not config.allow_registration:
+        flash(_('管理员已关闭用户注册功能'), 'warning')
+        return redirect(url_for('auth.login'))
 
     form = RegistrationForm()
     if form.validate_on_submit():
