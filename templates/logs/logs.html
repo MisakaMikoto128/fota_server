@@ -43,14 +43,16 @@
                 </select>
             </div>
             <div class="col-md-2 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary me-2">
-                    <i class="bi bi-search me-1"></i>{{ _('搜索') }}
-                </button>
-                <a href="{{ url_for('logs.logs') }}" class="btn btn-outline-secondary">
-                    <i class="bi bi-x-circle me-1"></i>{{ _('重置') }}
-                </a>
+                <div class="d-flex flex-nowrap">
+                    <button type="submit" class="btn btn-primary me-2 text-nowrap">
+                        <i class="bi bi-search me-1"></i>{{ _('搜索') }}
+                    </button>
+                    <a href="{{ url_for('logs.logs') }}" class="btn btn-outline-secondary text-nowrap">
+                        <i class="bi bi-x-circle me-1"></i>{{ _('重置') }}
+                    </a>
+                </div>
             </div>
-            
+
             <div class="col-md-3">
                 <label for="start_date" class="form-label">{{ _('开始日期') }}</label>
                 <input type="date" class="form-control" id="start_date" name="start_date" value="{{ start_date }}">

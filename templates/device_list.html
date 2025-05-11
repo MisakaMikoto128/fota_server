@@ -38,12 +38,14 @@
                 </select>
             </div>
             <div class="col-12 text-end">
-                <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-search me-2"></i>搜索
-                </button>
-                <a href="{{ url_for('device_list') }}" class="btn btn-secondary">
-                    <i class="bi bi-x-circle me-2"></i>重置
-                </a>
+                <div class="d-inline-flex flex-nowrap">
+                    <button type="submit" class="btn btn-primary me-2 text-nowrap">
+                        <i class="bi bi-search me-2"></i>搜索
+                    </button>
+                    <a href="{{ url_for('device_list') }}" class="btn btn-secondary text-nowrap">
+                        <i class="bi bi-x-circle me-2"></i>重置
+                    </a>
+                </div>
             </div>
         </form>
     </div>
@@ -85,8 +87,8 @@
                                 <a href="{{ url_for('device_detail', device_id=device.id) }}" class="btn btn-outline-primary">
                                     <i class="bi bi-info-circle"></i>
                                 </a>
-                                <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" 
-                                        data-bs-target="#editDeviceModal" 
+                                <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal"
+                                        data-bs-target="#editDeviceModal"
                                         data-device-id="{{ device.id }}"
                                         data-device-imei="{{ device.imei }}"
                                         data-device-name="{{ device.name or '' }}">
@@ -101,8 +103,8 @@
                                     <i class="bi bi-check-circle"></i>
                                 </a>
                                 {% endif %}
-                                <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" 
-                                        data-bs-target="#deleteDeviceModal" 
+                                <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal"
+                                        data-bs-target="#deleteDeviceModal"
                                         data-device-id="{{ device.id }}"
                                         data-device-imei="{{ device.imei }}">
                                     <i class="bi bi-trash"></i>
@@ -114,7 +116,7 @@
                 </tbody>
             </table>
         </div>
-        
+
         <!-- 分页 -->
         {% if pagination.pages > 1 %}
         <nav aria-label="Page navigation" class="mt-4">
@@ -285,15 +287,15 @@ document.addEventListener('DOMContentLoaded', function() {
             const deviceId = button.getAttribute('data-device-id');
             const imei = button.getAttribute('data-device-imei');
             const name = button.getAttribute('data-device-name');
-            
+
             document.getElementById('edit_imei').value = imei;
             document.getElementById('edit_name').value = name;
-            
+
             const form = document.getElementById('editDeviceForm');
             form.action = "{{ url_for('edit_device', device_id=0) }}".replace('0', deviceId);
         });
     }
-    
+
     // 删除设备确认模态框
     const deleteDeviceModal = document.getElementById('deleteDeviceModal');
     if (deleteDeviceModal) {
@@ -301,7 +303,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const button = event.relatedTarget;
             const deviceId = button.getAttribute('data-device-id');
             const imei = button.getAttribute('data-device-imei');
-            
+
             document.getElementById('deleteImei').textContent = imei;
             document.getElementById('confirmDeleteDevice').href = "{{ url_for('delete_device', device_id=0) }}".replace('0', deviceId);
         });

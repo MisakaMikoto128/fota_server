@@ -41,12 +41,14 @@
                     <input type="date" class="form-control" id="date_to" name="date_to" value="{{ request.args.get('date_to', '') }}">
                 </div>
                 <div class="col-12 text-end">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-search me-2"></i>搜索
-                    </button>
-                    <a href="{{ url_for('logs') }}" class="btn btn-secondary">
-                        <i class="bi bi-x-circle me-2"></i>重置
-                    </a>
+                    <div class="d-inline-flex flex-nowrap">
+                        <button type="submit" class="btn btn-primary me-2 text-nowrap">
+                            <i class="bi bi-search me-2"></i>搜索
+                        </button>
+                        <a href="{{ url_for('logs') }}" class="btn btn-secondary text-nowrap">
+                            <i class="bi bi-x-circle me-2"></i>重置
+                        </a>
+                    </div>
                 </div>
             </form>
         </div>
@@ -106,7 +108,7 @@
                 </tbody>
             </table>
         </div>
-        
+
         <!-- 分页 -->
         {% if pagination.pages > 1 %}
         <nav aria-label="Page navigation" class="mt-4">
