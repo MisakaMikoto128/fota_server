@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, abort, jsonify
 from flask_login import login_required, current_user
 from flask_babel import gettext as _
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import os
 import subprocess
 import logging
@@ -210,48 +210,50 @@ def check_update():
 
     try:
         # 检查是否已经克隆过仓库
-        current_dir = os.path.dirname(os.path.abspath(__file__))
+        current_dir = os.getcwd()
         git_dir = os.path.join(current_dir, '.git')
 
         if os.path.exists(git_dir):
-            # 已有Git仓库，获取当前提交
-            current_commit = subprocess.check_output(
-                ['git', 'rev-parse', 'HEAD'],
-                stderr=subprocess.STDOUT,
-                universal_newlines=True
-            ).strip()
+            # 已有Git仓库，执行Git操作
+            def run_git_cmd(cmd, error_msg=None, default_value=None):
+                """执行Git命令并处理可能的错误"""
+                try:
+                    result = subprocess.check_output(
+                        cmd, stderr=subprocess.STDOUT, universal_newlines=True, shell=True
+                    ).strip()
+                    return result
+                except subprocess.CalledProcessError:
+                    if error_msg:
+                        log_output.append(error_msg)
+                    return default_value
+
+            # 获取仓库信息
+            current_commit = run_git_cmd(['git', 'rev-parse', 'HEAD'],
+                                        "无法获取当前提交，可能不是有效的Git仓库", "未知")
             log_output.append(f"当前提交: {current_commit}")
 
-            # 获取远程仓库URL
-            remote_url = subprocess.check_output(
-                ['git', 'config', '--get', 'remote.origin.url'],
-                stderr=subprocess.STDOUT,
-                universal_newlines=True
-            ).strip()
+            remote_url = run_git_cmd(['git', 'config', '--get', 'remote.origin.url'],
+                                    "无法获取远程仓库URL", "未知")
             log_output.append(f"远程仓库: {remote_url}")
 
-            # 获取当前分支
-            current_branch = subprocess.check_output(
-                ['git', 'rev-parse', '--abbrev-ref', 'HEAD'],
-                stderr=subprocess.STDOUT,
-                universal_newlines=True
-            ).strip()
+            current_branch = run_git_cmd(['git', 'rev-parse', '--abbrev-ref', 'HEAD'],
+                                        "无法获取当前分支", "未知")
             log_output.append(f"当前分支: {current_branch}")
 
             # 获取远程更新
-            fetch_output = subprocess.check_output(
-                ['git', 'fetch', 'origin', repo_config.repo_branch],
-                stderr=subprocess.STDOUT,
-                universal_newlines=True
-            )
+            fetch_output = run_git_cmd(['git', 'fetch', 'origin', repo_config.repo_branch],
+                                      "获取远程更新失败", "获取远程更新失败")
             log_output.append(fetch_output)
 
             # 检查是否有更新
-            diff_output = subprocess.check_output(
-                ['git', 'diff', f'HEAD..origin/{repo_config.repo_branch}', '--name-only'],
-                stderr=subprocess.STDOUT,
-                universal_newlines=True
-            )
+            diff_output = run_git_cmd(['git', 'diff', f'HEAD..origin/{repo_config.repo_branch}', '--name-only'],
+                                     "检查更新失败")
+            if diff_output is None:
+                return jsonify({
+                    'status': 'error',
+                    'message': _('检查更新失败'),
+                    'log': '\n'.join(log_output)
+                })
 
             if diff_output.strip():
                 # 有更新
@@ -259,23 +261,21 @@ def check_update():
                 log_output.append(diff_output)
 
                 # 获取最新提交信息
-                latest_commit = subprocess.check_output(
+                latest_commit = run_git_cmd(
                     ['git', 'rev-parse', f'origin/{repo_config.repo_branch}'],
-                    stderr=subprocess.STDOUT,
-                    universal_newlines=True
-                ).strip()
+                    "获取最新提交信息失败", "未知"
+                )
 
                 # 获取提交日志
-                log_message = subprocess.check_output(
+                log_message = run_git_cmd(
                     ['git', 'log', '--oneline', f'HEAD..origin/{repo_config.repo_branch}'],
-                    stderr=subprocess.STDOUT,
-                    universal_newlines=True
+                    "获取提交日志失败", "无法获取提交日志"
                 )
                 log_output.append(_("提交历史:"))
                 log_output.append(log_message)
 
                 # 更新配置
-                repo_config.last_check_time = datetime.utcnow()
+                repo_config.last_check_time = datetime.now(timezone.utc)
                 repo_config.last_commit = latest_commit
                 db.session.commit()
 
@@ -290,7 +290,7 @@ def check_update():
                 log_output.append(_("系统已是最新版本"))
 
                 # 更新检查时间
-                repo_config.last_check_time = datetime.utcnow()
+                repo_config.last_check_time = datetime.now(timezone.utc)
                 db.session.commit()
 
                 return jsonify({
@@ -319,7 +319,7 @@ def check_update():
             ).strip()
 
             # 更新配置
-            repo_config.last_check_time = datetime.utcnow()
+            repo_config.last_check_time = datetime.now(timezone.utc)
             repo_config.last_commit = latest_commit
             db.session.commit()
 
@@ -365,30 +365,51 @@ def update_system():
 
     try:
         # 检查是否已经克隆过仓库
-        current_dir = os.path.dirname(os.path.abspath(__file__))
+        # 使用当前工作目录作为项目根目录
+        current_dir = os.getcwd()
         git_dir = os.path.join(current_dir, '.git')
 
         if os.path.exists(git_dir):
             # 已有Git仓库，拉取更新
             log_output.append(_("正在拉取更新..."))
 
+            # 定义辅助函数执行Git命令
+            def run_git_cmd(cmd, error_msg=None, default_value=None):
+                """执行Git命令并处理可能的错误"""
+                try:
+                    result = subprocess.check_output(
+                        cmd, stderr=subprocess.STDOUT, universal_newlines=True, shell=True
+                    ).strip()
+                    return result
+                except subprocess.CalledProcessError:
+                    if error_msg:
+                        log_output.append(error_msg)
+                    return default_value
+
             # 拉取更新
-            pull_output = subprocess.check_output(
+            pull_output = run_git_cmd(
                 ['git', 'pull', 'origin', repo_config.repo_branch],
-                stderr=subprocess.STDOUT,
-                universal_newlines=True
+                "拉取更新失败"
             )
+
+            if pull_output is None:
+                return jsonify({
+                    'status': 'error',
+                    'message': _('拉取更新失败'),
+                    'log': '\n'.join(log_output)
+                })
+
             log_output.append(pull_output)
 
             # 获取最新提交信息
-            latest_commit = subprocess.check_output(
+            latest_commit = run_git_cmd(
                 ['git', 'rev-parse', 'HEAD'],
-                stderr=subprocess.STDOUT,
-                universal_newlines=True
-            ).strip()
+                "获取最新提交信息失败",
+                "未知"
+            )
 
             # 更新配置
-            repo_config.last_update_time = datetime.utcnow()
+            repo_config.last_update_time = datetime.now(timezone.utc)
             repo_config.last_commit = latest_commit
             db.session.commit()
 
@@ -453,7 +474,7 @@ def update_system():
                 )
 
                 # 更新配置
-                repo_config.last_update_time = datetime.utcnow()
+                repo_config.last_update_time = datetime.now(timezone.utc)
                 repo_config.last_commit = latest_commit.strip()
                 db.session.commit()
 
