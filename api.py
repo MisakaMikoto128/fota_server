@@ -39,7 +39,7 @@ def check_update():
         else:
             # 否则在所有设备中查找
             device = Device.query.filter_by(imei=imei).first()
-        
+
         if device:
             # 更新设备的当前版本和检查时间
             if current_version and device.current_version != current_version:
@@ -49,7 +49,7 @@ def check_update():
         elif project:
             # 自动创建新设备并添加到项目中
             device = Device(
-                imei=imei, 
+                imei=imei,
                 current_version=current_version,
                 project_id=project.id,
                 last_check_time=datetime.now()
@@ -159,11 +159,11 @@ def upgrade():
         else:
             # 否则在所有设备中查找
             device = Device.query.filter_by(imei=imei).first()
-        
+
         if not device:
             # 自动创建新设备
             device = Device(
-                imei=imei, 
+                imei=imei,
                 current_version=client_version,
                 project_id=project.id if project else None
             )
@@ -235,3 +235,11 @@ def download_firmware(filename):
     """提供固件下载服务（旧接口，保留兼容）"""
     logger.info(f"下载请求: {filename}")
     return send_from_directory(Config.UPDATE_DIR, filename, as_attachment=True)
+
+
+@api_bp.route('/api/generate_project_key', methods=['GET'])
+def generate_project_key():
+    """生成新的项目密钥"""
+    logger.info("生成新的项目密钥")
+    new_key = Project.generate_project_key()
+    return jsonify({"project_key": new_key})

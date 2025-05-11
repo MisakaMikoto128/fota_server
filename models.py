@@ -145,8 +145,13 @@ class Project(db.Model):
 
     @staticmethod
     def generate_project_key():
-        """生成项目密钥"""
-        return secrets.token_hex(16)
+        """生成项目密钥
+
+        生成一个更短且区分大小写的项目密钥
+        """
+        # 使用 token_urlsafe 生成包含大小写字母和数字的密钥
+        # 长度设为 12 个字符，比原来的 32 个字符短很多
+        return secrets.token_urlsafe(9)  # 生成约 12 个字符的密钥
 
     def __repr__(self):
         return f'<Project {self.name}>'
